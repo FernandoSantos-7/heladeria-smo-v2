@@ -7,80 +7,70 @@ import { postres } from './data/postres';
 import logo from './assets/logo-smo.png';
 import banner from './assets/banner-vitrina.jpeg';
 
-// Componente reutilizable para los desplegables
 const Acordeon = ({ titulo, children }) => {
   const [abierto, setAbierto] = useState(false);
   return (
-    <section className="mb-4">
+    <section className="mb-2">
       <button 
         onClick={() => setAbierto(!abierto)}
-        className="w-full flex justify-between items-center p-4 bg-white border-2 border-smo-verde rounded-xl shadow-sm text-smo-verde font-bold text-lg hover:bg-green-50 transition-all"
+        className="w-full flex justify-between items-center p-4 bg-white border-b border-gray-200 font-bold text-gray-700 hover:bg-gray-50"
       >
         {titulo}
         <span>{abierto ? '▲' : '▼'}</span>
       </button>
-      {abierto && <div className="p-4 bg-white border-x border-b border-green-100 rounded-b-xl animate-fade-in">{children}</div>}
+      {abierto && <div className="p-4 bg-gray-50">{children}</div>}
     </section>
   );
 };
 
 function App() {
+  // Definimos las categorías exactas que querés mostrar
+  const categorias = ['Chocolate', 'Cremas', 'Dulce de Leche', 'Frutales'];
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-10">
-      <header className="flex justify-center p-4 bg-white shadow-md">
-        <img src={logo} alt="Logo S'MO" className="h-20" />
+    <div className="min-h-screen bg-gray-100 pb-10">
+      <header className="flex justify-center p-4 bg-white shadow-sm">
+        <img src={logo} alt="Logo S'MO" className="h-12" />
       </header>
       
-      <section className="w-full h-64 overflow-hidden">
+      <section className="w-full h-48 overflow-hidden">
         <img src={banner} alt="Vitrina" className="w-full h-full object-cover" />
       </section>
 
-      <main className="max-w-2xl mx-auto p-4">
-        
-        <h2 className="text-xl font-bold text-center text-gray-700 mb-6">¿Qué vas a pedir hoy?</h2>
+      <main className="max-w-2xl mx-auto mt-4 bg-white shadow-sm">
+        <h2 className="text-center font-bold p-4">¿Qué vas a pedir hoy?</h2>
 
         <Acordeon titulo="1. Elegí tu Pote">
           {productos.potes.map(p => (
-            <div key={p.id} className="p-3 border-b last:border-0 flex justify-between items-center">
-              <span className="font-medium text-gray-800">{p.nombre}</span>
-              <button className="bg-smo-verde text-white px-4 py-1 rounded-lg text-sm">Agregar</button>
-            </div>
+            <div key={p.id} className="p-2 border-b">{p.nombre}</div>
           ))}
         </Acordeon>
 
         <Acordeon titulo="2. Consultá nuestros Gustos">
-          {catalogo.helados.map((h) => (
-            <div key={h.id} className="p-3 border-b last:border-0">
-              <h3 className="font-bold text-smo-verde">{h.nombre}</h3>
-              <p className="text-xs text-gray-500">{h.descripcion}</p>
+          {categorias.map(cat => (
+            <div key={cat} className="mb-4">
+              <h3 className="font-bold text-sm text-smo-verde uppercase border-b border-smo-verde mb-2">{cat}</h3>
+              {catalogo.helados.filter(h => h.categoria === cat).map(h => (
+                <div key={h.id} className="mb-2">
+                  <p className="font-bold text-gray-800">{h.nombre}</p>
+                  <p className="text-xs text-gray-500">{h.descripcion}</p>
+                </div>
+              ))}
             </div>
           ))}
         </Acordeon>
 
         <Acordeon titulo="3. Paletas Artesanales">
-          {paletas.map((p) => (
-            <div key={p.id} className="p-3 border-b last:border-0">
-              <h3 className="font-bold text-smo-verde">{p.nombre}</h3>
-            </div>
-          ))}
+          {paletas.map(p => <div key={p.id} className="p-2 border-b">{p.nombre}</div>)}
         </Acordeon>
 
         <Acordeon titulo="4. Tortas y Mini Tortas">
-          {[...tortas.mini, ...tortas.grandes].map(t => (
-            <div key={t.id} className="p-3 border-b last:border-0">
-              <h3 className="font-bold text-smo-verde">{t.nombre}</h3>
-            </div>
-          ))}
+          {[...tortas.mini, ...tortas.grandes].map(t => <div key={t.id} className="p-2 border-b">{t.nombre}</div>)}
         </Acordeon>
 
         <Acordeon titulo="5. Postres Especiales">
-          {postres.map((p) => (
-            <div key={p.id} className="p-3 border-b last:border-0">
-              <h3 className="font-bold text-smo-verde">{p.nombre}</h3>
-            </div>
-          ))}
+          {postres.map(p => <div key={p.id} className="p-2 border-b">{p.nombre}</div>)}
         </Acordeon>
-
       </main>
     </div>
   );
