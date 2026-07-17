@@ -1,12 +1,29 @@
-import { useState } from 'react';
-import { catalogo } from './data/gustos';
-import logo from './assets/logo-smo.png';
+import { useState } from "react";
+import logo from "./assets/logo-smo.png";
+import SeccionPotes from "./components/pedidos/SeccionPotes";
+import SeccionCategorias from "./components/catalogo/SeccionCategorias";
+import { useCarrito } from "./hooks/useCarrito";
 
 function App() {
-  const [modalAbierto, setModalAbierto] = useState(null);
-  
-  // Categorías fijas, sin errores
-  const categorias = ['Chocolate', 'Dulce de Leche', 'Cremas', 'Agua'];
+  const [poteElegido, setPoteElegido] = useState(null);
+  const [gustosElegidos, setGustosElegidos] = useState([]);
+  const { items, agregarItem, total, cumpleMinimo, faltaParaMinimo } = useCarrito();
+
+  function elegirPote(pote) {
+    setPoteElegido(pote);
+    setGustosElegidos([]); // al cambiar de pote, reinicia los gustos
+  }
+
+  function agregarAlCarrito() {
+    agregarItem({
+      id: poteElegido.id,
+      tipo: "pote",
+      nombre: `${poteElegido.nombre} (${gustosElegidos.join(", ")})`,
+      precio: poteElegido.precio,
+    });
+    setPoteElegido(null);
+    setGustosElegidos([]);
+  }
 
   return (
     <div className="min-h-screen bg-[#e8ede8] font-sans p-4">
@@ -14,41 +31,45 @@ function App() {
         <img src={logo} alt="Logo S'MO" className="h-20" />
       </header>
 
-      <main className="max-w-xl mx-auto space-y-4">
-        {categorias.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setModalAbierto(cat)}
-            className="w-full bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center hover:shadow-md transition"
-          >
-            <span className="font-bold text-gray-700 uppercase">{cat}</span>
-            <span className="text-[#4a5d4a] font-bold text-xs underline">VER CATÁLOGO</span>
-          </button>
-        ))}
-      </main>
+      <main className="max-w-xl mx-auto">
+        <SeccionPotes poteElegido={poteElegido} onElegirPote={elegirPote} />
 
-      {/* Modal funcional */}
-      {modalAbierto && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-xl max-h-[80vh] flex flex-col">
-            <div className="flex justify-between items-center mb-4 border-b pb-2">
-              <h2 className="font-bold text-gray-800 uppercase">{modalAbierto}</h2>
-              <button onClick={() => setModalAbierto(null)} className="text-sm text-red-600 font-bold">CERRAR</button>
+        <SeccionCategorias
+          poteElegido={poteElegido}
+          gustosElegidos={gustosElegidos}
+          onCambiarGustos={setGustosElegidos}
+        />
+
+        {poteElegido && gustosElegidos.length > 0 && (
+          <button
+            onClick={agregarAlCarrito}
+            className="w-full bg-[#4a5d4a] text-white font-bold py-3 rounded-xl mb-6"
+          >
+            Agregar al pedido
+          </button>
+        )}
+
+        {items.length > 0 && (
+          <section className="bg-white rounded-xl p-4 shadow-sm">
+            <p className="font-bold text-gray-800 mb-2">Tu pedido</p>
+            {items.map((it, i) => (
+              <div key={i} className="flex justify-between text-sm py-1 border-b">
+                <span>{it.nombre}</span>
+                <span>${it.precio.toLocaleString("es-AR")}</span>
+              </div>
+            ))}
+            <div className="flex justify-between font-bold mt-3">
+              <span>Total</span>
+              <span>${total.toLocaleString("es-AR")}</span>
             </div>
-            
-            <div className="overflow-y-auto space-y-3 pr-2">
-              {catalogo.helados
-                .filter(h => h.categoria === modalAbierto)
-                .map(h => (
-                  <div key={h.id} className="border-b pb-2">
-                    <p className="font-bold text-sm text-gray-800">{h.nombre}</p>
-                    <p className="text-xs text-gray-500">{h.descripcion}</p>
-                  </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+            {!cumpleMinimo && (
+              <p className="text-xs text-red-600 mt-2">
+                Faltan ${faltaParaMinimo.toLocaleString("es-AR")} para llegar al mínimo de compra.
+              </p>
+            )}
+          </section>
+        )}
+      </main>
     </div>
   );
 }
