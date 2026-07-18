@@ -3,10 +3,10 @@ import { useState, useMemo } from "react";
 import { MINIMO_COMPRA } from "../constants/config";
 
 export function useCarrito() {
-  const [items, setItems] = useState([]); // [{ id, tipo, nombre, precio, gustosElegidos, cantidad }]
+  const [items, setItems] = useState([]); // [{ id, tipo, nombre, precio, cantidad }]
 
   function agregarItem(item) {
-    setItems((prev) => [...prev, { ...item, cantidad: 1 }]);
+    setItems((prev) => [...prev, { ...item, cantidad: item.cantidad ?? 1 }]);
   }
 
   function quitarItem(index) {

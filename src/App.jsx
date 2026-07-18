@@ -1,20 +1,53 @@
+// src/App.jsx
 import { useState } from "react";
-import logo from "./assets/logo-smo.png";
+import HeaderBanner from "./components/layout/HeaderBanner";
+import NavegacionSecciones from "./components/layout/NavegacionSecciones";
 import SeccionPotes from "./components/pedidos/SeccionPotes";
 import SeccionCategorias from "./components/catalogo/SeccionCategorias";
+import SeccionPaletas from "./components/paletas/SeccionPaletas";
+import SeccionTortas from "./components/tortas/SeccionTortas";
+import SeccionPostres from "./components/postres/SeccionPostres";
+import ResumenPedido from "./components/pedidos/ResumenPedido";
+import DatosCliente from "./components/pedidos/DatosCliente";
 import { useCarrito } from "./hooks/useCarrito";
+import { validarDatosCliente } from "./utils/validarDatosCliente";
+import logoWatermark from "./assets/logo-smo.png";
+
+const ID_POTE_CUARTO = "pote-1-4-kilo";
+const MINIMO_POTE_CUARTO = 2;
 
 function App() {
+  const [seccionActiva, setSeccionActiva] = useState("potes");
   const [poteElegido, setPoteElegido] = useState(null);
   const [gustosElegidos, setGustosElegidos] = useState([]);
-  const { items, agregarItem, total, cumpleMinimo, faltaParaMinimo } = useCarrito();
+  const [datosCliente, setDatosCliente] = useState({ nombre: "", telefono: "", direccion: "" });
+  const [errores, setErrores] = useState({});
+  const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
+
+  const {
+    items,
+    agregarItem,
+    quitarItem,
+    cambiarCantidad,
+    total,
+    cumpleMinimo,
+    faltaParaMinimo,
+  } = useCarrito();
+
+  const cantidadPoteCuarto = items
+    .filter((it) => it.id === ID_POTE_CUARTO)
+    .reduce((acc, it) => acc + it.cantidad, 0);
+
+  const faltanCuartos = cantidadPoteCuarto > 0 && cantidadPoteCuarto < MINIMO_POTE_CUARTO;
 
   function elegirPote(pote) {
     setPoteElegido(pote);
-    setGustosElegidos([]); // al cambiar de pote, reinicia los gustos
+    setGustosElegidos([]);
   }
 
   function agregarAlCarrito() {
+    if (!poteElegido || gustosElegidos.length === 0) return;
+
     agregarItem({
       id: poteElegido.id,
       tipo: "pote",
@@ -25,51 +58,114 @@ function App() {
     setGustosElegidos([]);
   }
 
+  function confirmarPedido() {
+    const nuevosErrores = validarDatosCliente(datosCliente);
+    setErrores(nuevosErrores);
+
+    if (Object.keys(nuevosErrores).length > 0) return;
+    if (!cumpleMinimo) return;
+    if (faltanCuartos) return;
+
+    setPedidoConfirmado(true);
+  }
+
   return (
-    <div className="min-h-screen bg-[#e8ede8] font-sans p-4">
-      <header className="flex justify-center my-8">
-        <img src={logo} alt="Logo S'MO" className="h-20" />
-      </header>
+    <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative overflow-hidden">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `url(${logoWatermark})`,
+          backgroundRepeat: "repeat",
+          backgroundSize: "150px 150px",
+          opacity: 0.05,
+          mixBlendMode: "multiply",
+        }}
+        aria-hidden="true"
+      />
 
-      <main className="max-w-xl mx-auto">
-        <SeccionPotes poteElegido={poteElegido} onElegirPote={elegirPote} />
+      <div className="relative z-10">
+        <HeaderBanner />
 
-        <SeccionCategorias
-          poteElegido={poteElegido}
-          gustosElegidos={gustosElegidos}
-          onCambiarGustos={setGustosElegidos}
-        />
+        <main className="max-w-xl mx-auto mt-4">
+          <NavegacionSecciones
+            seccionActiva={seccionActiva}
+            onCambiarSeccion={setSeccionActiva}
+          />
 
-        {poteElegido && gustosElegidos.length > 0 && (
-          <button
-            onClick={agregarAlCarrito}
-            className="w-full bg-[#4a5d4a] text-white font-bold py-3 rounded-xl mb-6"
-          >
-            Agregar al pedido
-          </button>
-        )}
+          {seccionActiva === "potes" && (
+            <>
+              <SeccionPotes poteElegido={poteElegido} onElegirPote={elegirPote} />
 
-        {items.length > 0 && (
-          <section className="bg-white rounded-xl p-4 shadow-sm">
-            <p className="font-bold text-gray-800 mb-2">Tu pedido</p>
-            {items.map((it, i) => (
-              <div key={i} className="flex justify-between text-sm py-1 border-b">
-                <span>{it.nombre}</span>
-                <span>${it.precio.toLocaleString("es-AR")}</span>
-              </div>
-            ))}
-            <div className="flex justify-between font-bold mt-3">
-              <span>Total</span>
-              <span>${total.toLocaleString("es-AR")}</span>
-            </div>
-            {!cumpleMinimo && (
-              <p className="text-xs text-red-600 mt-2">
-                Faltan ${faltaParaMinimo.toLocaleString("es-AR")} para llegar al mínimo de compra.
-              </p>
-            )}
-          </section>
-        )}
-      </main>
+              <SeccionCategorias
+                poteElegido={poteElegido}
+                gustosElegidos={gustosElegidos}
+                onCambiarGustos={setGustosElegidos}
+              />
+
+              {poteElegido && gustosElegidos.length > 0 && (
+                <button
+                  onClick={agregarAlCarrito}
+                  className="w-full bg-[#4a5d4a] text-white font-bold py-3 rounded-xl mb-6 hover:bg-[#3d4d3d] transition"
+                >
+                  Agregar al pedido
+                </button>
+              )}
+            </>
+          )}
+
+          {seccionActiva === "paletas" && (
+            <SeccionPaletas onAgregarAlCarrito={agregarItem} />
+          )}
+
+          {seccionActiva === "tortas" && (
+            <SeccionTortas onAgregarAlCarrito={agregarItem} />
+          )}
+
+          {seccionActiva === "postres" && (
+            <SeccionPostres onAgregarAlCarrito={agregarItem} />
+          )}
+
+          <ResumenPedido
+            items={items}
+            total={total}
+            cumpleMinimo={cumpleMinimo}
+            faltaParaMinimo={faltaParaMinimo}
+            onCambiarCantidad={cambiarCantidad}
+            onQuitarItem={quitarItem}
+          />
+
+          {faltanCuartos && (
+            <p className="text-xs text-[#a9762f] bg-[#f7ecd9] border border-[#e8d3a5] rounded-lg p-3 mb-4">
+              Tenés {cantidadPoteCuarto} pote de 1/4 kg en el pedido. Este tamaño se vende mínimo
+              de a {MINIMO_POTE_CUARTO} — sumá otro 1/4 kg (con el botón +) o agregá otra presentación.
+            </p>
+          )}
+
+          {items.length > 0 && (
+            <>
+              <DatosCliente
+                datos={datosCliente}
+                onCambiarDatos={setDatosCliente}
+                errores={errores}
+              />
+
+              <button
+                onClick={confirmarPedido}
+                disabled={!cumpleMinimo || faltanCuartos}
+                className="w-full bg-[#4a5d4a] text-white font-bold py-3 rounded-xl disabled:opacity-40 hover:bg-[#3d4d3d] transition"
+              >
+                Confirmar pedido
+              </button>
+
+              {pedidoConfirmado && (
+                <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
+                  ¡Pedido confirmado! (Acá en el próximo paso lo mandamos por WhatsApp)
+                </p>
+              )}
+            </>
+          )}
+        </main>
+      </div>
     </div>
   );
 }

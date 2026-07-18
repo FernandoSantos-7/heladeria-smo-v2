@@ -1,8 +1,19 @@
+// src/components/catalogo/SeccionCategorias.jsx
 import { useState } from "react";
+import { Check, X } from "lucide-react";
 import { catalogo } from "../../data/gustos";
-import { CATEGORIA_STYLE, GUSTOS_POR_POTE } from "../../constants/config";
+import { GUSTOS_POR_POTE } from "../../constants/config";
+import detalleGustos from "../../assets/detalle-gustos-1.jpeg";
 
 const categorias = [...new Set(catalogo.helados.map((h) => h.categoria))];
+
+// Solo un color de acento por categoría (sin icono)
+const CATEGORIA_COLOR = {
+  Chocolate: "border-l-[#6b4226]",
+  "Dulce de Leche": "border-l-[#a9762f]",
+  Crema: "border-l-[#7a6a8a]",
+  Agua: "border-l-[#3b8a86]",
+};
 
 export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambiarGustos }) {
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
@@ -21,27 +32,24 @@ export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambi
       <p className="text-sm text-gray-500 mb-2">2. Elegí tus gustos por categoría</p>
 
       {poteElegido && (
-        <p className="text-xs text-[#4a5d4a] mb-2">
+        <p className="text-xs text-[#4a5d4a] mb-2 font-medium">
           Podés elegir {limite} gusto{limite > 1 ? "s" : ""} (llevás {gustosElegidos.length})
         </p>
       )}
 
       <div className="grid grid-cols-2 gap-3">
         {categorias.map((cat) => {
-          const style = CATEGORIA_STYLE[cat] ?? { bg: "bg-gray-100", text: "text-gray-800" };
+          const colorBorde = CATEGORIA_COLOR[cat] ?? "border-l-gray-300";
           const cantidad = catalogo.helados.filter((h) => h.categoria === cat).length;
           return (
             <button
               key={cat}
               disabled={!poteElegido}
               onClick={() => setCategoriaAbierta(cat)}
-              className={`${style.bg} ${style.text} text-left p-4 rounded-xl flex items-center gap-2 disabled:opacity-40 transition`}
+              className={`bg-white border border-gray-200 border-l-4 ${colorBorde} text-left p-4 rounded-xl disabled:opacity-40 transition hover:shadow-md`}
             >
-              <span className="text-lg">{style.emoji}</span>
-              <div>
-                <p className="font-bold text-sm">{cat}</p>
-                <p className="text-[11px] opacity-80">{cantidad} sabores</p>
-              </div>
+              <p className="font-bold text-sm text-gray-800">{cat}</p>
+              <p className="text-[11px] text-gray-400">{cantidad} sabores</p>
             </button>
           );
         })}
@@ -53,20 +61,24 @@ export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambi
           onClick={() => setCategoriaAbierta(null)}
         >
           <div
-            className="bg-white w-full max-w-md rounded-2xl p-5 shadow-xl max-h-[75vh] flex flex-col"
+            className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-xl max-h-[80vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center mb-3 border-b pb-2">
-              <h2 className="font-bold text-gray-800">{categoriaAbierta}</h2>
+            <div className="relative h-28 shrink-0">
+              <img src={detalleGustos} alt="" className="w-full h-full object-cover" />
               <button
                 onClick={() => setCategoriaAbierta(null)}
-                className="text-sm text-red-600 font-bold"
+                aria-label="Cerrar"
+                className="absolute top-2 right-2 bg-white/90 rounded-full p-1.5"
               >
-                CERRAR
+                <X size={16} />
               </button>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+                <h2 className="text-white font-bold">{categoriaAbierta}</h2>
+              </div>
             </div>
 
-            <div className="overflow-y-auto space-y-2 pr-1">
+            <div className="overflow-y-auto space-y-2 p-4">
               {catalogo.helados
                 .filter((h) => h.categoria === categoriaAbierta)
                 .map((h) => {
@@ -75,15 +87,19 @@ export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambi
                     <button
                       key={h.id}
                       onClick={() => toggleGusto(h.nombre)}
-                      className={`w-full text-left p-3 rounded-lg border flex justify-between items-start gap-2 ${
-                        elegido ? "bg-[#e8ede8] border-[#4a5d4a]" : "border-gray-200"
+                      className={`w-full text-left p-3 rounded-lg border flex justify-between items-start gap-2 transition ${
+                        elegido ? "bg-[#eef2ee] border-[#4a5d4a]" : "border-gray-200"
                       }`}
                     >
                       <div>
                         <p className="font-bold text-sm text-gray-800">{h.nombre}</p>
                         <p className="text-xs text-gray-500">{h.descripcion}</p>
                       </div>
-                      {elegido && <span className="text-[#4a5d4a] font-bold">✓</span>}
+                      {elegido && (
+                        <span className="text-[#4a5d4a] shrink-0">
+                          <Check size={18} />
+                        </span>
+                      )}
                     </button>
                   );
                 })}
