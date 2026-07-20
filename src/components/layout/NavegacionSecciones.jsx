@@ -4,7 +4,7 @@ const SECCIONES = [
   { id: "paletas", nombre: "Paletas" },
   { id: "tortas", nombre: "Tortas" },
   { id: "postres", nombre: "Postres" },
-  { id: "blister", nombre: "Blíster" },
+  { id: "blister", nombre: "Blíster de cucuruchos" },
 ];
 
 export default function NavegacionSecciones({ seccionActiva, onCambiarSeccion }) {
