@@ -13,7 +13,9 @@ export default function ResumenPedido({
 
   return (
     <section className="bg-white rounded-xl p-4 shadow-sm mb-6">
-      <p className="font-bold text-gray-800 mb-3">Tu pedido</p>
+      <p className="font-bold text-lg text-gray-800 mb-3">
+  🛒 Resumen de tu pedido
+</p>
 
       <div className="space-y-3">
         {items.map((it, i) => (
@@ -29,7 +31,7 @@ export default function ResumenPedido({
               <button
                 onClick={() => onCambiarCantidad(i, it.cantidad - 1)}
                 disabled={it.cantidad <= 1}
-                className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center disabled:opacity-30"
+               className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 transition flex items-center justify-center"
                 aria-label="Restar cantidad"
               >
                 <Minus size={14} />
@@ -37,14 +39,14 @@ export default function ResumenPedido({
               <span className="text-sm font-medium w-4 text-center">{it.cantidad}</span>
               <button
                 onClick={() => onCambiarCantidad(i, it.cantidad + 1)}
-                className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center"
+                className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 transition flex items-center justify-center"
                 aria-label="Sumar cantidad"
               >
                 <Plus size={14} />
               </button>
               <button
                 onClick={() => onQuitarItem(i)}
-                className="w-7 h-7 rounded-full flex items-center justify-center text-red-500 ml-1"
+                className="w-8 h-8 rounded-full hover:bg-red-50 text-red-500 transition flex items-center justify-center ml-1"
                 aria-label="Eliminar del pedido"
               >
                 <Trash2 size={16} />
@@ -54,7 +56,7 @@ export default function ResumenPedido({
         ))}
       </div>
 
-      <div className="flex justify-between font-bold mt-3 text-gray-800">
+           <div className="flex justify-between font-bold mt-3 text-gray-800">
         <span>Total</span>
         <span>${total.toLocaleString("es-AR")}</span>
       </div>
@@ -62,6 +64,12 @@ export default function ResumenPedido({
       {!cumpleMinimo && (
         <p className="text-xs text-red-600 mt-2">
           Faltan ${faltaParaMinimo.toLocaleString("es-AR")} para llegar al mínimo de compra ($15.000).
+        </p>
+      )}
+
+      {cumpleMinimo && (
+        <p className="text-sm text-green-600 font-medium mt-2">
+          ✅ Pedido mínimo alcanzado
         </p>
       )}
     </section>

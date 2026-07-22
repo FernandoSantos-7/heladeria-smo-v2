@@ -16,7 +16,7 @@ export default function HeaderBanner() {
   }, []);
 
   return (
-    <header className="max-w-xl mx-auto pt-6 pb-2">
+    <header className="max-w-3xl mx-auto pt-6 pb-2">
 
       <div className="flex flex-col items-center mb-4">
         <img
@@ -30,12 +30,12 @@ export default function HeaderBanner() {
         </p>
       </div>
 
-      <div className="relative rounded-2xl overflow-hidden shadow-md">
+      <div className="relative rounded-3xl overflow-hidden shadow-xl">
 
         <img
           src={heroSlides[slideActual].imagen}
           alt={heroSlides[slideActual].titulo}
-          className="w-full h-56 object-cover duration-700"
+          className="w-full h-72 md:h-80 object-cover duration-700"
         />
 
         <div className="absolute inset-0 bg-black/20 flex flex-col justify-end p-6">

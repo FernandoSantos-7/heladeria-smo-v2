@@ -18,14 +18,21 @@ const CATEGORIA_COLOR = {
 export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambiarGustos }) {
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
   const limite = poteElegido ? GUSTOS_POR_POTE[poteElegido.id] ?? 1 : 0;
-
-  function toggleGusto(nombre) {
-    if (gustosElegidos.includes(nombre)) {
-      onCambiarGustos(gustosElegidos.filter((g) => g !== nombre));
-    } else if (gustosElegidos.length < limite) {
-      onCambiarGustos([...gustosElegidos, nombre]);
-    }
+function toggleGusto(nombre) {
+  if (gustosElegidos.includes(nombre)) {
+    onCambiarGustos(gustosElegidos.filter((g) => g !== nombre));
+    return;
   }
+
+  if (gustosElegidos.length >= limite) return;
+
+  const nuevosGustos = [...gustosElegidos, nombre];
+
+  onCambiarGustos(nuevosGustos);
+
+  // Cerrar el modal después de elegir un gusto
+  setCategoriaAbierta(null);
+}
 
   return (
     <section className="mb-6">

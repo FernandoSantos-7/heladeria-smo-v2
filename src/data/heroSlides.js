@@ -1,25 +1,35 @@
+import bannerVitrina from "../assets/banner-vitrina.jpeg";
+import paletaMix2 from "../assets/paleta-mix-2.jpeg";
+import tortaOreo from "../assets/torta-oreo.jpeg";
+import postre from "../assets/postre-1.jpg";
+import cubanitos from "../assets/cubanitos.jpeg";
+
 const heroSlides = [
   {
-    id: 1,
-    imagen: "/imagenes/hero/hero-helados-1.jpg",
+    imagen: bannerVitrina,
     titulo: "Helados Artesanales",
-    descripcion:
-      "Más de 50 años elaborando helados con ingredientes seleccionados.",
+    descripcion: "Elaborados con ingredientes seleccionados y la mejor calidad."
   },
   {
-    id: 2,
-    imagen: "/imagenes/hero/hero-helados-2.jpg",
-    titulo: "Sabores Únicos",
-    descripcion:
-      "Descubrí nuestra amplia variedad de sabores artesanales.",
+    imagen: paletaMix2,
+    titulo: "Paletas Artesanales",
+    descripcion: "Paletas de crema, ideales para cualquier momento."
   },
   {
-    id: 3,
-    imagen: "/imagenes/hero/hero-helados-3.jpg",
-    titulo: "Calidad en Cada Cucharada",
-    descripcion:
-      "Tradición, pasión y calidad en cada elaboración.",
+    imagen: tortaOreo,
+    titulo: "Tortas Heladas",
+    descripcion: "Perfectas para cumpleaños, reuniones o darte un gusto."
   },
+  {
+    imagen: postre,
+    titulo: "Postres Helados",
+    descripcion: "Una opción irresistible para compartir."
+  },
+  {
+    imagen: cubanitos,
+    titulo: "Mucho más que helado",
+    descripcion: "Descubrí todas las especialidades de S'MO."
+  }
 ];
 
 export default heroSlides;
