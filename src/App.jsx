@@ -12,6 +12,8 @@ import DatosCliente from "./components/pedidos/DatosCliente";
 import { useCarrito } from "./hooks/useCarrito";
 import { validarDatosCliente } from "./utils/validarDatosCliente";
 import logoWatermark from "./assets/logo-smo.png";
+import SeccionBlister from "./components/blister/SeccionBlister";
+import SeccionVasitos from "./components/vasitos/SeccionVasitos";
 
 const ID_POTE_CUARTO = "pote-1-4-kilo";
 const MINIMO_POTE_CUARTO = 2;
@@ -35,17 +37,24 @@ function App() {
   } = useCarrito();
 
   const cantidadPoteCuarto = items
-    .filter((it) => it.id === ID_POTE_CUARTO)
-    .reduce((acc, it) => acc + it.cantidad, 0);
+  .filter((it) => it.id === ID_POTE_CUARTO)
+  .reduce((acc, it) => acc + it.cantidad, 0);
 
-  const faltanCuartos = cantidadPoteCuarto > 0 && cantidadPoteCuarto < MINIMO_POTE_CUARTO;
+// ¿Hay algún producto que NO sea un pote de 1/4?
+const hayOtrosProductos = items.some((it) => it.id !== ID_POTE_CUARTO);
 
-  function elegirPote(pote) {
-    setPoteElegido(pote);
-    setGustosElegidos([]);
-  }
+// La restricción solo aplica cuando el pedido tiene únicamente potes de 1/4
+const faltanCuartos =
+  cantidadPoteCuarto > 0 &&
+  cantidadPoteCuarto < MINIMO_POTE_CUARTO &&
+  !hayOtrosProductos;
 
-  function agregarAlCarrito() {
+function elegirPote(pote) {
+  setPoteElegido(pote);
+  setGustosElegidos([]);
+}
+
+function agregarAlCarrito() {
     if (!poteElegido || gustosElegidos.length === 0) return;
 
     agregarItem({
@@ -124,6 +133,12 @@ function App() {
           {seccionActiva === "postres" && (
             <SeccionPostres onAgregarAlCarrito={agregarItem} />
           )}
+          {seccionActiva === "blister" && (
+            <SeccionBlister onAgregarAlCarrito={agregarItem} />
+          )}
+          {seccionActiva === "vasitos" && (
+           <SeccionVasitos onAgregarAlCarrito={agregarItem} />
+          )}
 
           <ResumenPedido
             items={items}
@@ -136,8 +151,9 @@ function App() {
 
           {faltanCuartos && (
             <p className="text-xs text-[#a9762f] bg-[#f7ecd9] border border-[#e8d3a5] rounded-lg p-3 mb-4">
-              Tenés {cantidadPoteCuarto} pote de 1/4 kg en el pedido. Este tamaño se vende mínimo
-              de a {MINIMO_POTE_CUARTO} — sumá otro 1/4 kg (con el botón +) o agregá otra presentación.
+              Tenés {cantidadPoteCuarto} Un pote de 1/4 kg en el pedido.
+              Si el pedido contiene únicamente un potes de 1/4 kg, el mínimo es de {MINIMO_POTE_CUARTO} unidades.
+              También podés agregar cualquier otro producto y continuar con tu compra.
             </p>
           )}
 

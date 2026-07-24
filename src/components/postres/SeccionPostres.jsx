@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { X, Plus } from "lucide-react";
 import { postres } from "../../data/postres";
+import { PRECIO_POSTRE } from "../../constants/config";
 
 const categorias = [...new Set(postres.map((p) => p.categoria))];
 
@@ -12,7 +13,7 @@ export default function SeccionPostres({ onAgregarAlCarrito }) {
     <section className="mb-6">
       <p className="text-sm text-gray-500 mb-2">Elegí el tipo de postre</p>
       <p className="text-xs text-[#a9762f] bg-[#f7ecd9] border border-[#e8d3a5] rounded-lg p-2 mb-3">
-        Los precios de esta sección están pendientes de confirmar con Lucas.
+        Los precios de esta sección están a confirmar con Lucas.
       </p>
 
       <div className="grid grid-cols-2 gap-3">
@@ -62,13 +63,23 @@ export default function SeccionPostres({ onAgregarAlCarrito }) {
                     <div>
                       <p className="font-bold text-sm text-gray-800">{p.nombre}</p>
                       <p className="text-xs text-gray-500">{p.descripcion}</p>
-                      <p className="text-xs text-[#a9762f] mt-1">Precio a confirmar</p>
+                      <p className="text-xs text-gray-400 mt-1">${PRECIO_POSTRE.toLocaleString("es-AR")}
+                     </p>
+                      
                     </div>
                     <button
-                      disabled
-                      title="Precio pendiente de confirmar"
-                      className="shrink-0 bg-gray-300 text-white rounded-full p-2 cursor-not-allowed"
-                      aria-label={`${p.nombre} - precio pendiente`}
+                      onClick={() => {
+                          onAgregarAlCarrito({
+                          id: `postre-${p.id}`,
+                          tipo: "postre",
+                          nombre: p.nombre,
+                         precio: PRECIO_POSTRE,
+                         });
+
+                       setCategoriaAbierta(null);
+                       }}
+                      className="shrink-0 bg-[#f4a5d4] text-white rounded-full p-2"
+                      aria-label={`Agregar ${p.nombre}`}
                     >
                       <Plus size={16} />
                     </button>

@@ -69,14 +69,16 @@ export default function SeccionTortas({ onAgregarAlCarrito }) {
                         </p>
                       </div>
                       <button
-                        onClick={() =>
-                          onAgregarAlCarrito({
-                            id: `torta-${t.id}`,
-                            tipo: "torta",
-                            nombre: `Torta ${t.nombre} (${t.categoria})`,
-                            precio,
-                          })
-                        }
+                        onClick={() => {
+                        onAgregarAlCarrito({
+                        id: `torta-${t.id}`,
+                        tipo: "torta",
+                        nombre: `Torta ${t.nombre} (${t.categoria})`,
+                        precio,
+                        });
+
+                       setCategoriaAbierta(null);
+                        }}
                         className="shrink-0 bg-[#4a5d4a] text-white rounded-full p-2"
                         aria-label={`Agregar ${t.nombre}`}
                       >

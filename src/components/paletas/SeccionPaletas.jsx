@@ -4,6 +4,7 @@ import { X, Plus } from "lucide-react";
 import { paletas } from "../../data/paletas";
 import { PRECIO_PALETA } from "../../constants/config";
 
+
 const categorias = [...new Set(paletas.map((p) => p.categoria))];
 
 const CATEGORIA_COLOR = {
@@ -71,14 +72,16 @@ export default function SeccionPaletas({ onAgregarAlCarrito }) {
                       </p>
                     </div>
                     <button
-                      onClick={() =>
-                        onAgregarAlCarrito({
-                          id: `paleta-${p.id}`,
-                          tipo: "paleta",
-                          nombre: p.nombre,
-                          precio: PRECIO_PALETA,
-                        })
-                      }
+                       onClick={() => {
+                       onAgregarAlCarrito({
+                       id: `paleta-${p.id}`,
+                       tipo: "paleta",
+                       nombre: p.nombre,
+                       precio: PRECIO_PALETA,
+                         });
+
+                       setCategoriaAbierta(null);
+                       }}
                       className="shrink-0 bg-[#4a5d4a] text-white rounded-full p-2"
                       aria-label={`Agregar ${p.nombre}`}
                     >

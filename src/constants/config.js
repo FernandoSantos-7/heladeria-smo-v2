@@ -1,8 +1,11 @@
 // src/constants/config.js
-
+export const PRECIO_POSTRE = 10000;
 export const MINIMO_COMPRA = 15000;
-
-export const WHATSAPP_NUMBER = "5491100000000"; // reemplazar por el número real de Lucas
+export const MAX_VASITOS = 20;
+export const PRECIO_VASITO = 0;
+export const PRECIO_BLISTER = 3000;
+export const UNIDADES_POR_BLISTER = 3;
+export const WHATSAPP_NUMBER = "5491154229565"; // reemplazar por el número real de Lucas
 
 // Cuántos gustos puede elegir el cliente según el tamaño del pote
 export const GUSTOS_POR_POTE = {
