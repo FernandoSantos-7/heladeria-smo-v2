@@ -6,7 +6,7 @@ const SECCIONES = [
   { id: "tortas", nombre: "Tortas" },
   { id: "postres", nombre: "Postres" },
   { id: "blister", nombre: "Blíster de cucuruchos" },
-  { id: "vasitos", nombre: "Vasitos" },
+  { id: "vasitos", nombre: "Vasitos Comestibles" },
 ];
 
 export default function NavegacionSecciones({

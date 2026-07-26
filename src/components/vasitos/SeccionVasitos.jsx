@@ -12,7 +12,7 @@ export default function SeccionVasitos({ onAgregarAlCarrito }) {
       </h2>
 
       <p className="text-gray-500">
-        Podés solicitar hasta {MAX_VASITOS} vasitos.
+         Vasitos comestibles sin cargo para acompañar tu pedido.
       </p>
 
       <p className="font-semibold">
@@ -43,17 +43,18 @@ export default function SeccionVasitos({ onAgregarAlCarrito }) {
         </button>
 
       </div>
-
-      <p>
-        {cantidad} {cantidad === 1 ? "vasito" : "vasitos"}
+      
+        <p>
+            {cantidad} {cantidad === 1 ? "vasito comestible" : "vasitos comestibles"}
       </p>
+    
 
       <button
         onClick={() =>
           onAgregarAlCarrito({
             id: "vasitos",
             tipo: "vasitos",
-            nombre: "Vasitos sin cargo",
+            nombre: "Vasitos comestibles sin cargo",
             cantidad,
             precio: PRECIO_VASITO,
           })
