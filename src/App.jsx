@@ -14,6 +14,7 @@ import { validarDatosCliente } from "./utils/validarDatosCliente";
 import logoWatermark from "./assets/logo-smo.png";
 import SeccionBlister from "./components/blister/SeccionBlister";
 import SeccionVasitos from "./components/vasitos/SeccionVasitos";
+import SeccionCafeteria from "./components/cafeteria/SeccionCafeteria";
 
 const ID_POTE_CUARTO = "pote-1-4-kilo";
 const MINIMO_POTE_CUARTO = 2;
@@ -139,6 +140,8 @@ function agregarAlCarrito() {
           {seccionActiva === "vasitos" && (
            <SeccionVasitos onAgregarAlCarrito={agregarItem} />
           )}
+          {seccionActiva === "cafeteria" && 
+          ( <SeccionCafeteria />)}
 
           <ResumenPedido
             items={items}
