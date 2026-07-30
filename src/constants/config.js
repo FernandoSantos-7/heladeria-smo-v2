@@ -3,7 +3,7 @@ export const PRECIO_POSTRE = 10000;
 export const MINIMO_COMPRA = 15000;
 export const MAX_VASITOS = 20;
 export const PRECIO_VASITO = 0;
-export const PRECIO_BLISTER = 3000;
+export const PRECIO_BLISTER = 4000;
 export const UNIDADES_POR_BLISTER = 3;
 export const WHATSAPP_NUMBER = "5491154229565"; // reemplazar por el número real de Lucas
 

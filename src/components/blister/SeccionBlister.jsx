@@ -1,3 +1,5 @@
+
+import blisterCucuruchos from "../../assets/blister-cucurucho.jpeg";
 import { useState } from "react";
 import {
   PRECIO_BLISTER,
@@ -12,10 +14,18 @@ export default function SeccionBlister({ onAgregarAlCarrito }) {
 
   return (
     <section className="space-y-4">
+      <img
+    src={blisterCucuruchos}
+    alt="Blíster de cucuruchos"
+    className="w-full h-64 object-cover rounded-2xl shadow-md"
+    />
 
       <h2 className="text-xl font-bold">
         Blíster de cucuruchos
       </h2>
+      <p className="text-gray-600">
+         Ideal para acompañar tu pedido de helado. Cada blíster contiene 3 cucuruchos artesanales.
+      </p>
 
       <p className="text-gray-500">
         1 blíster contiene {UNIDADES_POR_BLISTER} unidades
@@ -55,14 +65,14 @@ export default function SeccionBlister({ onAgregarAlCarrito }) {
       </p>
 
       <button
-         onClick={() =>
-         onAgregarAlCarrito({
-         id: "blister",
-        tipo: "blister",
-        nombre: "Blíster de cucuruchos",
-        cantidad,
-        unidades,
-        precio: total,
+  onClick={() =>
+    onAgregarAlCarrito({
+      id: "blister",
+      tipo: "blister",
+      nombre: "Blíster de cucuruchos",
+      cantidad,
+      unidades,
+      precio: PRECIO_BLISTER ,
     })
   }
   className="w-full rounded-xl bg-[#f4a5d4] py-3 font-semibold text-white hover:bg-pink-300 transition"

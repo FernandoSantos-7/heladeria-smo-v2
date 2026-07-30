@@ -26,7 +26,7 @@ export default function HeaderBanner() {
         />
 
         <p className="italic text-sm text-[#4a5d4a] mt-2 tracking-wide">
-          S'MO — La dulce tentación
+          S'MO La dulce tentación
         </p>
       </div>
 

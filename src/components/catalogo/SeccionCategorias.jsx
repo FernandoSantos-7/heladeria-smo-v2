@@ -68,22 +68,28 @@ function toggleGusto(nombre) {
           onClick={() => setCategoriaAbierta(null)}
         >
           <div
-            className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-xl max-h-[80vh] flex flex-col"
-            onClick={(e) => e.stopPropagation()}
+             className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-xl max-h-[80vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative h-28 shrink-0">
-              <img src={detalleGustos} alt="" className="w-full h-full object-cover" />
-              <button
+          <div className="relative h-28 shrink-0">
+          <img
+            src={detalleGustos}
+              alt=""
+            className="w-full h-full object-cover"
+        />
+            <button
+                type="button"
                 onClick={() => setCategoriaAbierta(null)}
                 aria-label="Cerrar"
-                className="absolute top-2 right-2 bg-white/90 rounded-full p-1.5"
-              >
-                <X size={16} />
-              </button>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
-                <h2 className="text-white font-bold">{categoriaAbierta}</h2>
-              </div>
+                className="absolute top-2 right-2 z-20 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition"
+             >
+             <X size={18} />
+            </button>
+
+           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+             <h2 className="text-white font-bold">{categoriaAbierta}</h2>
             </div>
+           </div>
 
             <div className="overflow-y-auto space-y-2 p-4">
               {catalogo.helados

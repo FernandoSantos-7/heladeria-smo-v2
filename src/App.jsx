@@ -15,6 +15,7 @@ import logoWatermark from "./assets/logo-smo.png";
 import SeccionBlister from "./components/blister/SeccionBlister";
 import SeccionVasitos from "./components/vasitos/SeccionVasitos";
 import SeccionCafeteria from "./components/cafeteria/SeccionCafeteria";
+import FooterLocal from "./components/layout/FooterLocal";
 
 const ID_POTE_CUARTO = "pote-1-4-kilo";
 const MINIMO_POTE_CUARTO = 2;
@@ -94,8 +95,8 @@ function agregarAlCarrito() {
       />
 
       <div className="relative z-10">
-        <HeaderBanner />
-
+            <HeaderBanner />
+  
         <main className="max-w-xl mx-auto mt-4">
           <NavegacionSecciones
             seccionActiva={seccionActiva}
@@ -183,6 +184,7 @@ function agregarAlCarrito() {
               )}
             </>
           )}
+                <FooterLocal />
         </main>
       </div>
     </div>
