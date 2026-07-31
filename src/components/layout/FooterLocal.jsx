@@ -13,7 +13,7 @@ export default function FooterLocal() {
           <MapPin className="text-[#4a5d4a] mt-1" size={20} />
           <div>
             <p className="font-semibold">Dirección</p>
-            <p>Av. Crovara, Tapiales</p>
+            <p>Av. Bologne Sur Mer 1099, Tapiales</p>
           </div>
         </div>
 
@@ -21,9 +21,7 @@ export default function FooterLocal() {
           <Clock className="text-[#4a5d4a] mt-1" size={20} />
           <div>
             <p className="font-semibold">Horarios de atención</p>
-            <p>Lunes a jueves: 12:00 a 00:00</p>
-            <p>Viernes y sábado: 12:00 a 01:00</p>
-            <p>Domingo: 12:00 a 00:00</p>
+            <p>Lunes a Domingo: 12:00 a 00:00</p>
           </div>
         </div>
 
