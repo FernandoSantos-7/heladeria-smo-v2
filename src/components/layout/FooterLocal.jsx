@@ -10,12 +10,34 @@ export default function FooterLocal() {
 
       <div className="space-y-4 text-gray-700">
         <div className="flex items-start gap-3">
-          <MapPin className="text-[#4a5d4a] mt-1" size={20} />
-          <div>
-            <p className="font-semibold">Dirección</p>
-            <p>Av. Bologne Sur Mer 1099, Tapiales</p>
-          </div>
-        </div>
+  <MapPin className="text-[#4a5d4a] mt-1" size={22} />
+
+  <div>
+    <p className="font-semibold text-gray-800">Dirección</p>
+
+    <a
+      href="https://www.google.com/maps/search/?api=1&query=Av.+Boulogne+Sur+Mer+1099,+Tapiales,+Buenos+Aires"
+      target="_blank"
+      rel="noreferrer"
+      className="text-gray-600 hover:text-[#4a5d4a] transition"
+    >
+      Av. Boulogne Sur Mer 1099
+    </a>
+
+    <p className="text-sm text-gray-500 mt-1">
+      Tapiales, Buenos Aires
+    </p>
+
+    <a
+      href="https://www.google.com/maps/search/?api=1&query=Av.+Boulogne+Sur+Mer+1099,+Tapiales,+Buenos+Aires"
+      target="_blank"
+      rel="noreferrer"
+      className="inline-block text-sm text-[#4a5d4a] font-medium mt-1 hover:underline"
+    >
+      Ver ubicación en Google Maps →
+    </a>
+  </div>
+</div>
 
         <div className="flex items-start gap-3">
           <Clock className="text-[#4a5d4a] mt-1" size={20} />
