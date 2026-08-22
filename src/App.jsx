@@ -60,13 +60,12 @@ function agregarAlCarrito() {
     if (!poteElegido || gustosElegidos.length === 0) return;
 
     agregarItem({
-      id: poteElegido.id,
-      tipo: "pote",
-      nombre: `${poteElegido.nombre} (${gustosElegidos.join(", ")})`,
-      precio: poteElegido.precio,
-    });
-    setPoteElegido(null);
-    setGustosElegidos([]);
+  id: `${poteElegido.id}-${gustosElegidos.join("-")}`,
+  productoId: poteElegido.id,
+  tipo: "pote",
+  nombre: `${poteElegido.nombre} (${gustosElegidos.join(", ")})`,
+  precio: poteElegido.precio,
+});
   }
 
   function confirmarPedido() {
