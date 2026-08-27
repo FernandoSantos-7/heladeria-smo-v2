@@ -79,6 +79,14 @@ export default function FooterLocal() {
               <FaFacebookF size={18} />
               Facebook: @heladeriasmo
             </a>
+            <a
+               href="https://wa.me/5491154229565?text=Hola%20Helader%C3%ADa%20S%27MO%2C%20tengo%20una%20consulta."
+               target="_blank"
+               rel="noreferrer"
+               className="mt-4 flex items-center justify-center gap-2 bg-[#4a5d4a] hover:bg-[#3d4d3d] text-white font-semibold py-3 px-4 rounded-xl transition"
+             >
+               💬 Consultas por WhatsApp
+            </a>
           </div>
         </div>
       </div>
