@@ -259,18 +259,17 @@ function App() {
                     📱 Transferencia
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setMetodoPago("Mercado Pago")}
-                    className={`px-4 py-3 rounded-lg font-medium border flex items-center gap-3 ${
-                      metodoPago === "Mercado Pago"
-                        ? "bg-green-700 text-white border-green-700"
-                        : "bg-white text-gray-700 border-gray-300"
-                    }`}
-                  >
-                    <img src={logoMercadoPago} alt="Mercado Pago" className="w-16 h-16 object-contain" />
-                    <span className="text-base font-semibold">Mercado Pago</span>
-                  </button>
+                <button
+                  type="button"
+                  onClick={() => setMetodoPago("Mercado Pago")}
+                 className={`p-2 rounded-lg font-medium border flex items-center justify-center ${
+                 metodoPago === "Mercado Pago"
+                  ? "bg-green-700 text-white border-green-700"
+                 : "bg-white text-gray-700 border-gray-300"
+                 }`}
+                >
+                 <img src={logoMercadoPago} alt="Mercado Pago" className="w-40 h-20 object-contain mx-auto" />
+                 </button>
                 </div>
               </div>
 
