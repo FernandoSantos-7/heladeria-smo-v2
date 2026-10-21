@@ -46,7 +46,7 @@ export function useCarrito() {
   }
 
   const total = useMemo(
-    () => items.reduce((acc, it) => acc + it.precio * it.cantidad, 0),
+    () => items.reduce((acc, it) => acc + (it.precio * it.cantidad), 0),
     [items]
   );
 

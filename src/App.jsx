@@ -12,6 +12,7 @@ import DatosCliente from "./components/pedidos/DatosCliente";
 import { useCarrito } from "./hooks/useCarrito";
 import { validarDatosCliente } from "./utils/validarDatosCliente";
 import logoWatermark from "./assets/logo-smo.png";
+import logoMercadoPago from "./assets/mercadopago.png";
 import SeccionBlister from "./components/blister/SeccionBlister";
 import SeccionVasitos from "./components/vasitos/SeccionVasitos";
 import SeccionCafeteria from "./components/cafeteria/SeccionCafeteria";
@@ -20,6 +21,7 @@ import FooterLocal from "./components/layout/FooterLocal";
 const ID_POTE_CUARTO = "pote-1-4-kilo";
 const MINIMO_POTE_CUARTO = 2;
 const WHATSAPP_NUMERO = "5491154229565";
+
 function App() {
   const [seccionActiva, setSeccionActiva] = useState("potes");
   const [poteElegido, setPoteElegido] = useState(null);
@@ -40,33 +42,33 @@ function App() {
   } = useCarrito();
 
   const cantidadPoteCuarto = items
-  .filter((it) => it.id === ID_POTE_CUARTO)
-  .reduce((acc, it) => acc + it.cantidad, 0);
+    .filter((it) => it.id === ID_POTE_CUARTO)
+    .reduce((acc, it) => acc + it.cantidad, 0);
 
-// ¿Hay algún producto que NO sea un pote de 1/4?
-const hayOtrosProductos = items.some((it) => it.id !== ID_POTE_CUARTO);
+  // ¿Hay algún producto que NO sea un pote de 1/4?
+  const hayOtrosProductos = items.some((it) => it.id !== ID_POTE_CUARTO);
 
-// La restricción solo aplica cuando el pedido tiene únicamente potes de 1/4
-const faltanCuartos =
-  cantidadPoteCuarto > 0 &&
-  cantidadPoteCuarto < MINIMO_POTE_CUARTO &&
-  !hayOtrosProductos;
+  // La restricción solo aplica cuando el pedido tiene únicamente potes de 1/4
+  const faltanCuartos =
+    cantidadPoteCuarto > 0 &&
+    cantidadPoteCuarto < MINIMO_POTE_CUARTO &&
+    !hayOtrosProductos;
 
-function elegirPote(pote) {
-  setPoteElegido(pote);
-  setGustosElegidos([]);
-}
+  function elegirPote(pote) {
+    setPoteElegido(pote);
+    setGustosElegidos([]);
+  }
 
-function agregarAlCarrito() {
+  function agregarAlCarrito() {
     if (!poteElegido || gustosElegidos.length === 0) return;
 
     agregarItem({
-  id: `${poteElegido.id}-${gustosElegidos.join("-")}`,
-  productoId: poteElegido.id,
-  tipo: "pote",
-  nombre: `${poteElegido.nombre} (${gustosElegidos.join(", ")})`,
-  precio: poteElegido.precio,
-});
+      id: `${poteElegido.id}-${gustosElegidos.join("-")}`,
+      productoId: poteElegido.id,
+      tipo: "pote",
+      nombre: `${poteElegido.nombre} (${gustosElegidos.join(", ")})`,
+      precio: poteElegido.precio,
+    });
   }
 
   async function confirmarPedido() {
@@ -78,13 +80,13 @@ function agregarAlCarrito() {
     if (faltanCuartos) return;
 
     try {
-     // 1. Armamos el objeto con los datos que espera Django
+      // 1. Armamos el objeto con los datos que espera Django
       const pedidoData = {
         nombre_cliente: datosCliente.nombre,
         telefono: datosCliente.telefono,
         direccion: datosCliente.direccion,
         total: total,
-        metodo_pago: metodoPago, // <--- Aquí usa la variable que elegimos
+        metodo_pago: metodoPago,
         monto_con_que_paga: null,
         vuelto: null,
         items: items.map((it) => ({
@@ -108,7 +110,28 @@ function agregarAlCarrito() {
 
       const pedidoCreado = await respuesta.json();
 
-      // 3. Disparamos la orden de impresión automática a la ticketera USB
+      // 3. Si eligió Mercado Pago, pedimos la preferencia y lo redirigimos
+      if (metodoPago === "Mercado Pago") {
+        const respMp = await fetch("http://127.0.0.1:8000/api/crear-preferencia/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ total: total }),
+        });
+
+        const datosMp = await respMp.json();
+        console.log("Lo que respondió Django:", datosMp);
+
+        if (datosMp.init_point) {
+          window.location.href = datosMp.init_point;
+          return;
+        } else {
+          alert("El backend respondió pero no vino el init_point. Mirá la consola.");
+        }
+      }
+
+      // 4. Si es efectivo o transferencia, disparamos la impresión normal
       await fetch(`http://127.0.0.1:8000/api/pedidos/${pedidoCreado.id}/imprimir/`, {
         method: "POST",
       });
@@ -119,6 +142,7 @@ function agregarAlCarrito() {
       alert("Hubo un error al registrar o imprimir el pedido.");
     }
   }
+
   return (
     <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative overflow-hidden">
       <div
@@ -134,8 +158,8 @@ function agregarAlCarrito() {
       />
 
       <div className="relative z-10">
-            <HeaderBanner />
-  
+        <HeaderBanner />
+
         <main className="max-w-xl mx-auto mt-4">
           <NavegacionSecciones
             seccionActiva={seccionActiva}
@@ -208,33 +232,47 @@ function agregarAlCarrito() {
                 errores={errores}
               />
               {/* Selector de Método de Pago */}
-      <div className="mb-4">
-        <label className="block text-gray-700 font-semibold mb-2">Método de pago:</label>
-        <div className="flex gap-4">
-          <button
-            type="button"
-            onClick={() => setMetodoPago("Efectivo")}
-            className={`px-4 py-2 rounded-lg font-medium border ${
-              metodoPago === "Efectivo" 
-                ? "bg-green-700 text-white border-green-700" 
-                : "bg-white text-gray-700 border-gray-300"
-            }`}
-          >
-            💵 Efectivo
-          </button>
-          <button
-            type="button"
-            onClick={() => setMetodoPago("Transferencia")}
-            className={`px-4 py-2 rounded-lg font-medium border ${
-              metodoPago === "Transferencia" 
-                ? "bg-green-700 text-white border-green-700" 
-                : "bg-white text-gray-700 border-gray-300"
-            }`}
-          >
-            📱 Transferencia
-          </button>
-        </div>
-      </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-semibold mb-2">Método de pago:</label>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setMetodoPago("Efectivo")}
+                    className={`px-4 py-2 rounded-lg font-medium border ${
+                      metodoPago === "Efectivo" 
+                        ? "bg-green-700 text-white border-green-700" 
+                        : "bg-white text-gray-700 border-gray-300"
+                    }`}
+                  >
+                    💵 Efectivo
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMetodoPago("Transferencia")}
+                    className={`px-4 py-2 rounded-lg font-medium border ${
+                      metodoPago === "Transferencia" 
+                        ? "bg-green-700 text-white border-green-700" 
+                        : "bg-white text-gray-700 border-gray-300"
+                    }`}
+                  >
+                    📱 Transferencia
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setMetodoPago("Mercado Pago")}
+                    className={`px-4 py-3 rounded-lg font-medium border flex items-center gap-3 ${
+                      metodoPago === "Mercado Pago"
+                        ? "bg-green-700 text-white border-green-700"
+                        : "bg-white text-gray-700 border-gray-300"
+                    }`}
+                  >
+                    <img src={logoMercadoPago} alt="Mercado Pago" className="w-16 h-16 object-contain" />
+                    <span className="text-base font-semibold">Mercado Pago</span>
+                  </button>
+                </div>
+              </div>
 
               <button
                 onClick={confirmarPedido}
@@ -251,7 +289,7 @@ function agregarAlCarrito() {
               )}
             </>
           )}
-                <FooterLocal />
+          <FooterLocal />
         </main>
       </div>
     </div>

@@ -1,9 +1,11 @@
+import os
+import mercadopago
+from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from .models import Pedido
 from .serializers import PedidoSerializer
-import os
 
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all().order_by('-creado_el')
@@ -16,7 +18,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
         # Armamos el texto del ticket incluyendo pago y vuelto
         ticket_texto = f"""
 ================================
-         HELADERIA S&MO         
+          HELADERIA S&MO        
 ================================
 Pedido Nro: {pedido.id}
 Fecha: {pedido.creado_el.strftime('%d/%m/%Y %H:%M')}
@@ -58,3 +60,41 @@ Método de Pago: {pedido.metodo_pago}
             return Response({"status": "Impresión enviada con éxito"})
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+
+@api_view(['POST'])
+def crear_preferencia_mp(request):
+    try:
+        sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
+
+        data = request.data
+        total_pedido = data.get('total', 0)
+
+        preference_data = {
+            "items": [
+                {
+                    "title": "Pedido Heladería S'MO",
+                    "quantity": 1,
+                    "currency_id": "ARS",
+                    "unit_price": float(total_pedido)
+                }
+            ],
+            "back_urls": {
+                "success": "http://localhost:5173",
+                "failure": "http://localhost:5173",
+                "pending": "http://localhost:5173"
+            }
+        }
+
+        preference_response = sdk.preference().create(preference_data)
+        print("RESPUESTA CRUDA DE MERCADO PAGO:", preference_response)
+
+        preference = preference_response.get("response", {})
+        init_point = preference.get("init_point")
+
+        return Response({
+            "init_point": init_point
+        })
+    except Exception as e:
+        print("ERROR EN DJANGO:", str(e))
+        return Response({"error": str(e)}, status=500)
