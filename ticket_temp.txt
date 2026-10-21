@@ -1,0 +1,25 @@
+
+================================
+         HELADERIA S&MO         
+================================
+Pedido Nro: 8
+Fecha: 21/10/2026 14:50
+Cliente: fernando santos
+Teléfono: 12345678
+Dirección: olaavarra2634
+--------------------------------
+DETALLE:
+- 1x Pote 1 KG (Dulce de Leche Borguese) ($25000.00)
+  Gustos: Pote 1 KG (Dulce de Leche Borguese)
+- 1x Pote 1 KG (Alfajor 70% amargo) ($25000.00)
+  Gustos: Pote 1 KG (Alfajor 70% amargo)
+--------------------------------
+TOTAL: $50000.00
+Método de Pago: Transferencia
+================================
+      ¡GRACIAS POR SU COMPRA!   
+================================
+
+
+
+

@@ -19,7 +19,7 @@ import FooterLocal from "./components/layout/FooterLocal";
 
 const ID_POTE_CUARTO = "pote-1-4-kilo";
 const MINIMO_POTE_CUARTO = 2;
-
+const WHATSAPP_NUMERO = "5491154229565";
 function App() {
   const [seccionActiva, setSeccionActiva] = useState("potes");
   const [poteElegido, setPoteElegido] = useState(null);
@@ -27,6 +27,7 @@ function App() {
   const [datosCliente, setDatosCliente] = useState({ nombre: "", telefono: "", direccion: "" });
   const [errores, setErrores] = useState({});
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
+  const [metodoPago, setMetodoPago] = useState("Efectivo");
 
   const {
     items,
@@ -68,7 +69,7 @@ function agregarAlCarrito() {
 });
   }
 
-  function confirmarPedido() {
+  async function confirmarPedido() {
     const nuevosErrores = validarDatosCliente(datosCliente);
     setErrores(nuevosErrores);
 
@@ -76,9 +77,48 @@ function agregarAlCarrito() {
     if (!cumpleMinimo) return;
     if (faltanCuartos) return;
 
-    setPedidoConfirmado(true);
-  }
+    try {
+     // 1. Armamos el objeto con los datos que espera Django
+      const pedidoData = {
+        nombre_cliente: datosCliente.nombre,
+        telefono: datosCliente.telefono,
+        direccion: datosCliente.direccion,
+        total: total,
+        metodo_pago: metodoPago, // <--- Aquí usa la variable que elegimos
+        monto_con_que_paga: null,
+        vuelto: null,
+        items: items.map((it) => ({
+          producto_nombre: it.nombre,
+          cantidad: it.cantidad,
+          precio_unitario: it.precio,
+          gustos: it.tipo === "pote" ? it.nombre : "",
+        })),
+      };
 
+      // 2. Guardamos el pedido en el backend de Django
+      const respuesta = await fetch("http://127.0.0.1:8000/api/pedidos/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(pedidoData),
+      });
+
+      if (!respuesta.ok) throw new Error("Error al guardar el pedido en el servidor");
+
+      const pedidoCreado = await respuesta.json();
+
+      // 3. Disparamos la orden de impresión automática a la ticketera USB
+      await fetch(`http://127.0.0.1:8000/api/pedidos/${pedidoCreado.id}/imprimir/`, {
+        method: "POST",
+      });
+
+      setPedidoConfirmado(true);
+    } catch (error) {
+      console.error(error);
+      alert("Hubo un error al registrar o imprimir el pedido.");
+    }
+  }
   return (
     <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative overflow-hidden">
       <div
@@ -167,6 +207,34 @@ function agregarAlCarrito() {
                 onCambiarDatos={setDatosCliente}
                 errores={errores}
               />
+              {/* Selector de Método de Pago */}
+      <div className="mb-4">
+        <label className="block text-gray-700 font-semibold mb-2">Método de pago:</label>
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={() => setMetodoPago("Efectivo")}
+            className={`px-4 py-2 rounded-lg font-medium border ${
+              metodoPago === "Efectivo" 
+                ? "bg-green-700 text-white border-green-700" 
+                : "bg-white text-gray-700 border-gray-300"
+            }`}
+          >
+            💵 Efectivo
+          </button>
+          <button
+            type="button"
+            onClick={() => setMetodoPago("Transferencia")}
+            className={`px-4 py-2 rounded-lg font-medium border ${
+              metodoPago === "Transferencia" 
+                ? "bg-green-700 text-white border-green-700" 
+                : "bg-white text-gray-700 border-gray-300"
+            }`}
+          >
+            📱 Transferencia
+          </button>
+        </div>
+      </div>
 
               <button
                 onClick={confirmarPedido}
