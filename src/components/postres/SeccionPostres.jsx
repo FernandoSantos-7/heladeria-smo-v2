@@ -11,22 +11,22 @@ const POSTRE_COLORS = {
   Alfajores: {
     borde: "border-l-[#E3A008]", // Amarillo Oro brillante
     hover: "hover:border-[#E3A008] hover:bg-[#E3A008]/10 hover:shadow-[0_0_20px_rgba(227,160,8,0.4)]",
-    hoverItem: "hover:border-[#E3A008] hover:bg-[#E3A008]/10",
+    hoverItem: "hover:border-[#E3A008] hover:bg-[#E3A008]/10 cursor-pointer",
   },
   Helixir: {
     borde: "border-l-[#10B981]", // Verde Esmeralda brillante
     hover: "hover:border-[#10B981] hover:bg-[#10B981]/10 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]",
-    hoverItem: "hover:border-[#10B981] hover:bg-[#10B981]/10",
+    hoverItem: "hover:border-[#10B981] hover:bg-[#10B981]/10 cursor-pointer",
   },
   Cubanitos: {
     borde: "border-l-[#9333EA]", // Violeta profundo brillante
     hover: "hover:border-[#9333EA] hover:bg-[#9333EA]/10 hover:shadow-[0_0_20px_rgba(147,51,234,0.4)]",
-    hoverItem: "hover:border-[#9333EA] hover:bg-[#9333EA]/10",
+    hoverItem: "hover:border-[#9333EA] hover:bg-[#9333EA]/10 cursor-pointer",
   },
   default: {
     borde: "border-l-[#6366F1]", // Índigo brillante por defecto
     hover: "hover:border-[#6366F1] hover:bg-[#6366F1]/10 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]",
-    hoverItem: "hover:border-[#6366F1] hover:bg-[#6366F1]/10",
+    hoverItem: "hover:border-[#6366F1] hover:bg-[#6366F1]/10 cursor-pointer",
   }
 };
 
@@ -84,35 +84,43 @@ export default function SeccionPostres({ onAgregarAlCarrito }) {
                 <div className="overflow-y-auto space-y-2 p-4">
                   {postres
                     .filter((p) => p.categoria === categoriaAbierta)
-                    .map((p) => (
-                      <div
-                        key={p.id}
-                        className={`w-full text-left p-3 rounded-lg border border-gray-200 flex justify-between items-start gap-2 transition ${estiloActual.hoverItem}`}
-                      >
-                        <div>
-                          <p className="font-bold text-sm text-gray-800">{p.nombre}</p>
-                          <p className="text-xs text-gray-500">{p.descripcion}</p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            ${PRECIO_POSTRE.toLocaleString("es-AR")}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => {
-                            onAgregarAlCarrito({
-                              id: `postre-${p.id}`,
-                              tipo: "postre",
-                              nombre: p.nombre,
-                              precio: PRECIO_POSTRE,
-                            });
-                            setCategoriaAbierta(null);
-                          }}
-                          className="shrink-0 bg-[#4a5d4a] text-white rounded-full p-2 hover:bg-[#3b4d3b] transition shadow-sm"
-                          aria-label={`Agregar ${p.nombre}`}
+                    .map((p) => {
+                      const agregarItem = () => {
+                        onAgregarAlCarrito({
+                          id: `postre-${p.id}`,
+                          tipo: "postre",
+                          nombre: p.nombre,
+                          precio: PRECIO_POSTRE,
+                        });
+                        setCategoriaAbierta(null);
+                      };
+
+                      return (
+                        <div
+                          key={p.id}
+                          onClick={agregarItem}
+                          className={`w-full text-left p-3 rounded-lg border border-gray-200 flex justify-between items-start gap-2 transition ${estiloActual.hoverItem}`}
                         >
-                          <Plus size={16} />
-                        </button>
-                      </div>
-                    ))}
+                          <div>
+                            <p className="font-bold text-sm text-gray-800">{p.nombre}</p>
+                            <p className="text-xs text-gray-500">{p.descripcion}</p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              ${PRECIO_POSTRE.toLocaleString("es-AR")}
+                            </p>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              agregarItem();
+                            }}
+                            className="shrink-0 bg-[#4a5d4a] text-white rounded-full p-2 hover:bg-[#3b4d3b] transition shadow-sm"
+                            aria-label={`Agregar ${p.nombre}`}
+                          >
+                            <Plus size={16} />
+                          </button>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             </div>

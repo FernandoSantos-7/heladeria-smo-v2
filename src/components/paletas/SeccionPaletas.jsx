@@ -11,12 +11,12 @@ const CATEGORIA_COLOR = {
   Crema: {
     borde: "border-l-[#8A2BE2]", // Violeta eléctrico/fluo
     hover: "hover:border-[#8A2BE2] hover:bg-[#8A2BE2]/10 hover:shadow-[0_0_20px_rgba(138,43,226,0.4)]",
-    hoverItem: "hover:border-[#8A2BE2] hover:bg-[#8A2BE2]/10",
+    hoverItem: "hover:border-[#8A2BE2] hover:bg-[#8A2BE2]/10 cursor-pointer",
   },
   Agua: {
     borde: "border-l-[#00CED1]", // Turquesa/celeste fluo fresco
     hover: "hover:border-[#00CED1] hover:bg-[#00CED1]/10 hover:shadow-[0_0_20px_rgba(0,206,209,0.4)]",
-    hoverItem: "hover:border-[#00CED1] hover:bg-[#00CED1]/10",
+    hoverItem: "hover:border-[#00CED1] hover:bg-[#00CED1]/10 cursor-pointer",
   },
 };
 
@@ -24,7 +24,7 @@ export default function SeccionPaletas({ onAgregarAlCarrito }) {
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
 
   const estiloActual = CATEGORIA_COLOR[categoriaAbierta] || {
-    hoverItem: "hover:border-gray-400 hover:bg-gray-50",
+    hoverItem: "hover:border-gray-400 hover:bg-gray-50 cursor-pointer",
   };
 
   return (
@@ -74,35 +74,43 @@ export default function SeccionPaletas({ onAgregarAlCarrito }) {
             <div className="overflow-y-auto space-y-2 p-4">
               {paletas
                 .filter((p) => p.categoria === categoriaAbierta)
-                .map((p) => (
-                  <div
-                    key={p.id}
-                    className={`w-full text-left p-3 rounded-lg border border-gray-200 flex justify-between items-start gap-2 transition ${estiloActual.hoverItem}`}
-                  >
-                    <div>
-                      <p className="font-bold text-sm text-gray-800">{p.nombre}</p>
-                      <p className="text-xs text-gray-500">{p.descripcion}</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        ${PRECIO_PALETA.toLocaleString("es-AR")}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => {
-                        onAgregarAlCarrito({
-                          id: `paleta-${p.id}`,
-                          tipo: "paleta",
-                          nombre: p.nombre,
-                          precio: PRECIO_PALETA,
-                        });
-                        setCategoriaAbierta(null);
-                      }}
-                      className="shrink-0 bg-[#4a5d4a] text-white rounded-full p-2 hover:bg-[#3b4d3b] transition shadow-sm"
-                      aria-label={`Agregar ${p.nombre}`}
+                .map((p) => {
+                  const agregarItem = () => {
+                    onAgregarAlCarrito({
+                      id: `paleta-${p.id}`,
+                      tipo: "paleta",
+                      nombre: p.nombre,
+                      precio: PRECIO_PALETA,
+                    });
+                    setCategoriaAbierta(null);
+                  };
+
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={agregarItem}
+                      className={`w-full text-left p-3 rounded-lg border border-gray-200 flex justify-between items-start gap-2 transition ${estiloActual.hoverItem}`}
                     >
-                      <Plus size={16} />
-                    </button>
-                  </div>
-                ))}
+                      <div>
+                        <p className="font-bold text-sm text-gray-800">{p.nombre}</p>
+                        <p className="text-xs text-gray-500">{p.descripcion}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          ${PRECIO_PALETA.toLocaleString("es-AR")}
+                        </p>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Evita doble ejecución
+                          agregarItem();
+                        }}
+                        className="shrink-0 bg-[#4a5d4a] text-white rounded-full p-2 hover:bg-[#3b4d3b] transition shadow-sm"
+                        aria-label={`Agregar ${p.nombre}`}
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>

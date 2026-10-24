@@ -1,4 +1,5 @@
 import os
+import textwrap
 import mercadopago
 from django.conf import settings
 from rest_framework import viewsets
@@ -15,25 +16,37 @@ class PedidoViewSet(viewsets.ModelViewSet):
     def imprimir(self, request, pk=None):
         pedido = self.get_object()
         
-        # Armamos el texto del ticket incluyendo pago y vuelto
-        ticket_texto = f"""
-================================
-          HELADERIA S&MO        
-================================
+        # Ancho fijo exacto para papel térmico de 80mm (32 caracteres)
+        ANCHO_TICKET = 32
+        separador = "=" * ANCHO_TICKET
+        guiones = "-" * ANCHO_TICKET
+        
+        # Función auxiliar para ajustar textos largos al ancho del ticket sin pasarse
+        def ajustar_texto(texto, prefix=""):
+            # textwrap cuida que las líneas no superen el ancho del papel térmico
+            lineas = textwrap.wrap(str(texto), width=ANCHO_TICKET - len(prefix))
+            return "\n".join([f"{prefix}{linea}" for linea in lineas])
+
+        # Armamos el texto del ticket con formato estricto de 32 columnas
+        ticket_texto = f"""{separador}
+         HELADERIA S&MO         
+{separador}
 Pedido Nro: {pedido.id}
 Fecha: {pedido.creado_el.strftime('%d/%m/%Y %H:%M')}
 Cliente: {pedido.nombre_cliente}
 Teléfono: {pedido.telefono}
 Dirección: {pedido.direccion}
---------------------------------
+{guiones}
 DETALLE:
 """
         for item in pedido.items.all():
-            ticket_texto += f"- {item.cantidad}x {item.producto_nombre} (${item.precio_unitario})\n"
+            linea_item = f"- {item.cantidad}x {item.producto_nombre} (${item.precio_unitario})"
+            ticket_texto += f"{ajustar_texto(linea_item)}\n"
             if item.gustos:
-                ticket_texto += f"  Gustos: {item.gustos}\n"
+                linea_gustos = f"Gustos: {item.gustos}"
+                ticket_texto += f"{ajustar_texto(linea_gustos, prefix='  ')}\n"
 
-        ticket_texto += f"""--------------------------------
+        ticket_texto += f"""{guiones}
 TOTAL: ${pedido.total}
 Método de Pago: {pedido.metodo_pago}
 """
@@ -42,9 +55,9 @@ Método de Pago: {pedido.metodo_pago}
             if pedido.vuelto is not None:
                 ticket_texto += f"Vuelto: ${pedido.vuelto}\n"
 
-        ticket_texto += f"""================================
+        ticket_texto += f"""{separador}
       ¡GRACIAS POR SU COMPRA!   
-================================
+{separador}
 \n\n\n
 """
 

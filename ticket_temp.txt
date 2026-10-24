@@ -1,21 +1,44 @@
-
 ================================
-          HELADERIA S&MO        
+         HELADERIA S&MO         
 ================================
-Pedido Nro: 25
-Fecha: 21/10/2026 22:47
-Cliente: Fernando Santos
-Teléfono: 1154229565
-Dirección: olavarria123
+Pedido Nro: 40
+Fecha: 24/10/2026 20:20
+Cliente: dsfdsfsd
+Teléfono: 1234567899
+Dirección: dsfsdsdsd123
 --------------------------------
 DETALLE:
-- 1x Pote 1/4 KG (Banana Split) ($8000.00)
-  Gustos: Pote 1/4 KG (Banana Split)
-- 1x Pote 1 KG (Banana) ($25000.00)
-  Gustos: Pote 1 KG (Banana)
+- 1x Pote 1 KG (Chocolate
+Blanco, Dulce de Leche
+Bariloche, Caramelo Salado,
+Capuchino Crunch) ($25000.00)
+  Gustos: Pote 1 KG (Chocolate
+  Blanco, Dulce de Leche
+  Bariloche, Caramelo Salado,
+  Capuchino Crunch)
+- 1x Pote 1/2 KG (Chocolate
+Amargo, Dulce de Leche Borguese,
+Dulce de Leche Bariloche)
+($15000.00)
+  Gustos: Pote 1/2 KG (Chocolate
+  Amargo, Dulce de Leche
+  Borguese, Dulce de Leche
+  Bariloche)
+- 1x Pote 1/4 KG (Dulce de Leche
+Borguese, Frambuesa Patagonica,
+Dulce de Leche Bariloche)
+($8000.00)
+  Gustos: Pote 1/4 KG (Dulce de
+  Leche Borguese, Frambuesa
+  Patagonica, Dulce de Leche
+  Bariloche)
+- 1x Paleta de Americana
+($5050.00)
+- 4x Blíster de cucuruchos
+($4000.00)
 --------------------------------
-TOTAL: $33000.00
-Método de Pago: Mercado Pago
+TOTAL: $69050.00
+Método de Pago: Efectivo
 ================================
       ¡GRACIAS POR SU COMPRA!   
 ================================

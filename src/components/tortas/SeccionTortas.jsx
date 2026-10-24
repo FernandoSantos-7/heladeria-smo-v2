@@ -6,23 +6,22 @@ import { PRECIO_TORTA } from "../../constants/config";
 
 const categorias = [...new Set(tortas.map((t) => t.categoria))];
 
-// Colores únicos y exclusivos para cada tamaño/categoría de torta (¡sin repetir con paletas!)
+// Colores únicos y exclusivos para cada tamaño/categoría de torta (¡sin repetir con paletas y sin rojo!)
 const TRAY_COLORS = {
   Chica: {
     borde: "border-l-[#FF4500]", // Naranja fuego brillante
     hover: "hover:border-[#FF4500] hover:bg-[#FF4500]/10 hover:shadow-[0_0_20px_rgba(255,69,0,0.4)]",
-    hoverItem: "hover:border-[#FF4500] hover:bg-[#FF4500]/10",
+    hoverItem: "hover:border-[#FF4500] hover:bg-[#FF4500]/10 cursor-pointer",
   },
   Grande: {
     borde: "border-l-[#32CD32]", // Verde lima eléctrico brillante
     hover: "hover:border-[#32CD32] hover:bg-[#32CD32]/10 hover:shadow-[0_0_20px_rgba(50,205,50,0.4)]",
-    hoverItem: "hover:border-[#32CD32] hover:bg-[#32CD32]/10",
+    hoverItem: "hover:border-[#32CD32] hover:bg-[#32CD32]/10 cursor-pointer",
   },
-  // Por si hay alguna otra categoría extra:
   default: {
     borde: "border-l-[#FF1493]", // Fucsia brillante por las dudas
     hover: "hover:border-[#FF1493] hover:bg-[#FF1493]/10 hover:shadow-[0_0_20px_rgba(255,20,147,0.4)]",
-    hoverItem: "hover:border-[#FF1493] hover:bg-[#FF1493]/10",
+    hoverItem: "hover:border-[#FF1493] hover:bg-[#FF1493]/10 cursor-pointer",
   }
 };
 
@@ -81,9 +80,20 @@ export default function SeccionTortas({ onAgregarAlCarrito }) {
                     .filter((t) => t.categoria === categoriaAbierta)
                     .map((t) => {
                       const precio = PRECIO_TORTA[t.categoria] ?? 0;
+                      const agregarItem = () => {
+                        onAgregarAlCarrito({
+                          id: `torta-${t.id}`,
+                          tipo: "torta",
+                          nombre: `Torta ${t.nombre} (${t.categoria})`,
+                          precio,
+                        });
+                        setCategoriaAbierta(null);
+                      };
+
                       return (
                         <div
                           key={t.id}
+                          onClick={agregarItem}
                           className={`w-full text-left p-3 rounded-lg border border-gray-200 flex justify-between items-start gap-2 transition ${estiloActual.hoverItem}`}
                         >
                           <div>
@@ -94,14 +104,9 @@ export default function SeccionTortas({ onAgregarAlCarrito }) {
                             </p>
                           </div>
                           <button
-                            onClick={() => {
-                              onAgregarAlCarrito({
-                                id: `torta-${t.id}`,
-                                tipo: "torta",
-                                nombre: `Torta ${t.nombre} (${t.categoria})`,
-                                precio,
-                              });
-                              setCategoriaAbierta(null);
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              agregarItem();
                             }}
                             className="shrink-0 bg-[#4a5d4a] text-white rounded-full p-2 hover:bg-[#3b4d3b] transition shadow-sm"
                             aria-label={`Agregar ${t.nombre}`}
