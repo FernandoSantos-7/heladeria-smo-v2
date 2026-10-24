@@ -88,6 +88,16 @@ export const catalogo = {
     { id: 55, nombre: "Limon al Agua", categoria: "Agua", descripcion: "Limon al Agua con jugo de limon al natural" },
     { id: 58, nombre: "Melon", categoria: "Agua", descripcion: "Melon al agua con melon al natural" },
     { id: 65, nombre: "Naranja", categoria: "Agua", descripcion: "Naranja al agua con jugo de naranjas naturales" },
-    { id: 67, nombre: "Peras con Frutillas", categoria: "Agua", descripcion: "Helado de agua sabor a pera con pedazos de frutillas naturales" }
-  ]
+    { id: 67, nombre: "Peras con Frutillas", categoria: "Agua", descripcion: "Helado de agua sabor a pera con pedazos de frutillas naturales" },
+
+    { id: 58, nombre: "Melon", categoria: "Agua", descripcion: "Melon al agua con melon al natural" },
+  { id: 65, nombre: "Naranja", categoria: "Agua", descripcion: "Naranja al agua con jugo de naranjas naturales" },
+  { id: 67, nombre: "Peras con Frutillas", categoria: "Agua", descripcion: "Helado de agua sabor a pera con pedazos de frutillas naturales" },
+  
+  // --- NUEVOS SABORES ---
+  { id: 100, nombre: "Caramelo Salado", categoria: "Nuevos Sabores", descripcion: "Delicioso helado de caramelo con un toque sutil de sal marina" },
+  { id: 101, nombre: "Dulce de Leche Bariloche", categoria: "Nuevos Sabores", descripcion: "Dulce de leche artesanal combinado con frambuesas y trozos de chocolate blanco" },
+  { id: 102, nombre: "Capuchino Crunch", categoria: "Nuevos Sabores", descripcion: "Base de helado de capuchino con una exquisita salsa de chocolate con café" }
+]
 };
+  

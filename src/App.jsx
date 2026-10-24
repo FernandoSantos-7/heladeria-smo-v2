@@ -131,7 +131,7 @@ function App() {
         }
       }
 
-      // 4. Si es efectivo o transferencia, disparamos la impresión normal
+      // 4. Si es efectivo, disparamos la impresión normal
       await fetch(`http://127.0.0.1:8000/api/pedidos/${pedidoCreado.id}/imprimir/`, {
         method: "POST",
       });
@@ -231,45 +231,37 @@ function App() {
                 onCambiarDatos={setDatosCliente}
                 errores={errores}
               />
-              {/* Selector de Método de Pago */}
-              <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-2">Método de pago:</label>
-                <div className="flex gap-4">
+              {/* Selector de Método de Pago Moderno */}
+              <div className="mb-6">
+                <label className="block text-gray-800 font-bold mb-3 text-lg">Método de pago:</label>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Botón Efectivo */}
                   <button
                     type="button"
                     onClick={() => setMetodoPago("Efectivo")}
-                    className={`px-4 py-2 rounded-lg font-medium border ${
-                      metodoPago === "Efectivo" 
-                        ? "bg-green-700 text-white border-green-700" 
-                        : "bg-white text-gray-700 border-gray-300"
+                    className={`p-4 rounded-xl font-semibold border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
+                      metodoPago === "Efectivo"
+                        ? "bg-emerald-50 border-emerald-600 text-emerald-800 shadow-md ring-2 ring-emerald-600/20"
+                        : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                     }`}
                   >
-                    💵 Efectivo
+                    <span className="text-2xl">💵</span>
+                    <span className="text-base">Efectivo</span>
                   </button>
 
+                  {/* Botón Mercado Pago */}
                   <button
                     type="button"
-                    onClick={() => setMetodoPago("Transferencia")}
-                    className={`px-4 py-2 rounded-lg font-medium border ${
-                      metodoPago === "Transferencia" 
-                        ? "bg-green-700 text-white border-green-700" 
-                        : "bg-white text-gray-700 border-gray-300"
+                    onClick={() => setMetodoPago("Mercado Pago")}
+                    className={`p-4 rounded-xl font-semibold border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
+                      metodoPago === "Mercado Pago"
+                        ? "bg-sky-50 border-sky-500 text-sky-900 shadow-md ring-2 ring-sky-500/20"
+                        : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                     }`}
                   >
-                    📱 Transferencia
+                    <img src={logoMercadoPago} alt="Mercado Pago" className="w-48 h-22 object-contain" />
+                    <span className="text-base">Mercado Pago</span>
                   </button>
-
-                <button
-                  type="button"
-                  onClick={() => setMetodoPago("Mercado Pago")}
-                 className={`p-2 rounded-lg font-medium border flex items-center justify-center ${
-                 metodoPago === "Mercado Pago"
-                  ? "bg-green-700 text-white border-green-700"
-                 : "bg-white text-gray-700 border-gray-300"
-                 }`}
-                >
-                 <img src={logoMercadoPago} alt="Mercado Pago" className="w-40 h-20 object-contain mx-auto" />
-                 </button>
                 </div>
               </div>
 
