@@ -1,31 +1,19 @@
 ================================
          HELADERIA S&MO         
 ================================
-Pedido Nro: 43
-Fecha: 24/10/2026 20:46
-Cliente: sxcsaas
-Teléfono: asdasdasd
-Dirección: saassad
+Pedido Nro: 48
+Fecha: 26/10/2026 23:09
+Cliente: Jorge
+Teléfono: 1154229565
+Dirección: siempre viva 1234
 --------------------------------
 DETALLE:
-- 1x Paleta de Frutilla y kiwi
-($5050.00)
-- 1x Paleta de Dulce de Leche
-($5050.00)
-- 1x Torta Marroc (Grande)
-($40000.00)
-- 1x Torta Mini Delicia (Mini)
-($12000.00)
-- 1x Cubanitos Mixtos
-($10000.00)
-- 1x Alfajor Dubai ($10000.00)
-- 1x Helixir Chocotorta
-($10000.00)
-- 1x Pote 1/4 KG (Banana)
-($8000.00)
-  Gustos: Pote 1/4 KG (Banana)
+- 1x Pote 1 KG (Chocolate al
+oporto con nuez) ($25000.00)
+  Gustos: Pote 1 KG (Chocolate
+  al oporto con nuez)
 --------------------------------
-TOTAL: $100100.00
+TOTAL: $25000.00
 Método de Pago: Efectivo
 ================================
       ¡GRACIAS POR SU COMPRA!   
