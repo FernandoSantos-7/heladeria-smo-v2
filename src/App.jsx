@@ -17,6 +17,7 @@ import SeccionBlister from "./components/blister/SeccionBlister";
 import SeccionVasitos from "./components/vasitos/SeccionVasitos";
 import SeccionCafeteria from "./components/cafeteria/SeccionCafeteria";
 import FooterLocal from "./components/layout/FooterLocal";
+import { Check } from "lucide-react";
 
 const ID_POTE_CUARTO = "pote-1-4-kilo";
 const MINIMO_POTE_CUARTO = 2;
@@ -30,6 +31,9 @@ function App() {
   const [errores, setErrores] = useState({});
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
   const [metodoPago, setMetodoPago] = useState("Efectivo");
+
+  // Estado local para la animación de éxito del botón en potes
+  const [agregadoPote, setAgregadoPote] = useState(false);
 
   const {
     items,
@@ -45,10 +49,8 @@ function App() {
     .filter((it) => it.id === ID_POTE_CUARTO)
     .reduce((acc, it) => acc + it.cantidad, 0);
 
-  // ¿Hay algún producto que NO sea un pote de 1/4?
   const hayOtrosProductos = items.some((it) => it.id !== ID_POTE_CUARTO);
 
-  // La restricción solo aplica cuando el pedido tiene únicamente potes de 1/4
   const faltanCuartos =
     cantidadPoteCuarto > 0 &&
     cantidadPoteCuarto < MINIMO_POTE_CUARTO &&
@@ -62,13 +64,29 @@ function App() {
   function agregarAlCarrito() {
     if (!poteElegido || gustosElegidos.length === 0) return;
 
-    agregarItem({
-      id: `${poteElegido.id}-${gustosElegidos.join("-")}`,
-      productoId: poteElegido.id,
-      tipo: "pote",
-      nombre: `${poteElegido.nombre} (${gustosElegidos.join(", ")})`,
-      precio: poteElegido.precio,
-    });
+    const itemId = `${poteElegido.id}-${gustosElegidos.join("-")}`;
+    const itemExistente = items.find((it) => it.id === itemId);
+
+    if (itemExistente) {
+      cambiarCantidad(itemId, itemExistente.cantidad + 1);
+    } else {
+      agregarItem({
+        id: itemId,
+        productoId: poteElegido.id,
+        tipo: "pote",
+        nombre: `${poteElegido.nombre} (${gustosElegidos.join(", ")})`,
+        precio: poteElegido.precio,
+      });
+    }
+
+    // Activamos la animación verde de éxito
+    setAgregadoPote(true);
+
+    // Limpiamos los gustos elegidos después de un breve delay para que se alcance a ver el verde
+    setTimeout(() => {
+      setGustosElegidos([]);
+      setAgregadoPote(false);
+    }, 800);
   }
 
   async function confirmarPedido() {
@@ -80,7 +98,6 @@ function App() {
     if (faltanCuartos) return;
 
     try {
-      // 1. Armamos el objeto con los datos que espera Django
       const pedidoData = {
         nombre_cliente: datosCliente.nombre,
         telefono: datosCliente.telefono,
@@ -97,7 +114,6 @@ function App() {
         })),
       };
 
-      // 2. Guardamos el pedido en el backend de Django
       const respuesta = await fetch("http://127.0.0.1:8000/api/pedidos/", {
         method: "POST",
         headers: {
@@ -110,7 +126,6 @@ function App() {
 
       const pedidoCreado = await respuesta.json();
 
-      // 3. Si eligió Mercado Pago, pedimos la preferencia y lo redirigimos
       if (metodoPago === "Mercado Pago") {
         const respMp = await fetch("http://127.0.0.1:8000/api/crear-preferencia/", {
           method: "POST",
@@ -121,7 +136,6 @@ function App() {
         });
 
         const datosMp = await respMp.json();
-        console.log("Lo que respondió Django:", datosMp);
 
         if (datosMp.init_point) {
           window.location.href = datosMp.init_point;
@@ -131,7 +145,6 @@ function App() {
         }
       }
 
-      // 4. Si es efectivo, disparamos la impresión normal
       await fetch(`http://127.0.0.1:8000/api/pedidos/${pedidoCreado.id}/imprimir/`, {
         method: "POST",
       });
@@ -179,9 +192,20 @@ function App() {
               {poteElegido && gustosElegidos.length > 0 && (
                 <button
                   onClick={agregarAlCarrito}
-                  className="w-full bg-[#4a5d4a] text-white font-bold py-3 rounded-xl mb-6 hover:bg-[#3d4d3d] transition"
+                  className={`w-full rounded-xl py-3 font-bold text-white transition-all duration-200 active:scale-95 shadow-md mb-6 flex items-center justify-center gap-2 ${
+                    agregadoPote 
+                      ? "bg-green-500 scale-95" 
+                      : "bg-[#4a5d4a] hover:bg-[#3d4d3d]"
+                  }`}
                 >
-                  Agregar al pedido
+                  {agregadoPote ? (
+                    <>
+                      <span>¡Agregado con éxito!</span>
+                      <Check size={18} className="stroke-[3]" />
+                    </>
+                  ) : (
+                    "Agregar al pedido"
+                  )}
                 </button>
               )}
             </>
@@ -231,11 +255,9 @@ function App() {
                 onCambiarDatos={setDatosCliente}
                 errores={errores}
               />
-              {/* Selector de Método de Pago Moderno */}
               <div className="mb-6">
                 <label className="block text-gray-800 font-bold mb-3 text-lg">Método de pago:</label>
                 <div className="grid grid-cols-2 gap-4">
-                  {/* Botón Efectivo */}
                   <button
                     type="button"
                     onClick={() => setMetodoPago("Efectivo")}
@@ -249,7 +271,6 @@ function App() {
                     <span className="text-base">Efectivo</span>
                   </button>
 
-                  {/* Botón Mercado Pago */}
                   <button
                     type="button"
                     onClick={() => setMetodoPago("Mercado Pago")}

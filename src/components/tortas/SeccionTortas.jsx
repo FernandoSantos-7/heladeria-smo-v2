@@ -1,6 +1,6 @@
 // src/components/tortas/SeccionTortas.jsx
 import { useState } from "react";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Check } from "lucide-react";
 import { tortas } from "../../data/tortas";
 import { PRECIO_TORTA } from "../../constants/config";
 
@@ -27,6 +27,7 @@ const TRAY_COLORS = {
 
 export default function SeccionTortas({ onAgregarAlCarrito }) {
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
+  const [agregandoId, setAgregandoId] = useState(null);
 
   return (
     <section className="mb-6">
@@ -41,7 +42,7 @@ export default function SeccionTortas({ onAgregarAlCarrito }) {
             <button
               key={cat}
               onClick={() => setCategoriaAbierta(cat)}
-              className={`bg-white border border-gray-200 border-l-4 ${configCat.borde} text-left p-4 rounded-xl transition ${configCat.hover} hover:shadow-md`}
+              className={`bg-white border border-gray-200 border-l-4 ${configCat.borde} text-left p-4 rounded-xl transition ${configCat.hover} hover:shadow-md active:scale-95`}
             >
               <p className="font-bold text-sm text-gray-800">Torta {cat}</p>
               <p className="text-[11px] text-gray-400">
@@ -80,21 +81,30 @@ export default function SeccionTortas({ onAgregarAlCarrito }) {
                     .filter((t) => t.categoria === categoriaAbierta)
                     .map((t) => {
                       const precio = PRECIO_TORTA[t.categoria] ?? 0;
+                      const estaAgregando = agregandoId === t.id;
+
                       const agregarItem = () => {
+                        if (estaAgregando) return;
+
                         onAgregarAlCarrito({
                           id: `torta-${t.id}`,
                           tipo: "torta",
                           nombre: `Torta ${t.nombre} (${t.categoria})`,
                           precio,
                         });
-                        setCategoriaAbierta(null);
+
+                        setAgregandoId(t.id);
+                        setTimeout(() => {
+                          setAgregandoId(null);
+                          setCategoriaAbierta(null);
+                        }, 600);
                       };
 
                       return (
                         <div
                           key={t.id}
                           onClick={agregarItem}
-                          className={`w-full text-left p-3 rounded-lg border border-gray-200 flex justify-between items-start gap-2 transition ${estiloActual.hoverItem}`}
+                          className={`w-full text-left p-3 rounded-lg border border-gray-200 flex justify-between items-start gap-2 transition active:scale-[0.98] ${estiloActual.hoverItem}`}
                         >
                           <div>
                             <p className="font-bold text-sm text-gray-800">{t.nombre}</p>
@@ -108,10 +118,14 @@ export default function SeccionTortas({ onAgregarAlCarrito }) {
                               e.stopPropagation();
                               agregarItem();
                             }}
-                            className="shrink-0 bg-[#4a5d4a] text-white rounded-full p-2 hover:bg-[#3b4d3b] transition shadow-sm"
+                            className={`shrink-0 rounded-full p-2 transition shadow-sm flex items-center justify-center ${
+                              estaAgregando
+                                ? "bg-green-500 text-white scale-105"
+                                : "bg-[#4a5d4a] text-white hover:bg-[#3b4d3b]"
+                            }`}
                             aria-label={`Agregar ${t.nombre}`}
                           >
-                            <Plus size={16} />
+                            {estaAgregando ? <Check size={16} /> : <Plus size={16} />}
                           </button>
                         </div>
                       );
