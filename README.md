@@ -1,18 +1,28 @@
-# React + Vite
+# Ice Cream Shop POS & Management System (v2)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An end-to-end full-stack web application designed to manage sales, inventory, and orders for an ice cream parlor. Built with a robust **Python/Django** backend and a dynamic **React/Vite** frontend.
 
-Currently, two official plugins are available:
+🔗 **Live Demo (Frontend Only):** [https://vercel.app](https://vercel.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🚀 Status: Work in Progress (~70% Complete)
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+The project is currently under active development. Core architectural components, database management, and essential workflows are fully functional in a local development environment.
 
-Note: This will impact Vite dev & build performances.
+> 💡 **Note on Deployment:** The frontend is hosted on Vercel for UI preview purposes. To experience the full full-stack functionality (database queries and API endpoints), the Django backend must be running locally.
 
-## Expanding the ESLint configuration
+## ✨ Key Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Payment Gateway Integration:** Integrated with Mercado Pago API for processing real-time local transactions.
+- **Order Management:** System to handle point-of-sale customer orders, flavor tracking, and ticket processing.
+- **Robust Backend Logic:** Powered by Django to manage APIs, business rules, and secure data handling.
+- **Dynamic Frontend UI:** Built with React and Vite for a highly responsive, modern user experience.
+- **Relational Database:** Out-of-the-box local storage utilizing SQLite for seamless deployment and fast query processing.
+
+## 🛠️ Tech Stack
+
+- **Backend:** Python, Django
+- **Frontend:** React, Vite, HTML5, CSS3, JavaScript (ES6+)
+- **Database:** SQLite
+- **Deployment:** Vercel (Frontend Preview)
