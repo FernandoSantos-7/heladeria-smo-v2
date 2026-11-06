@@ -10,12 +10,12 @@ export const WHATSAPP_NUMBER = "5491154229565"; // reemplazar por el número rea
 // Cuántos gustos puede elegir el cliente según el tamaño del pote
 export const GUSTOS_POR_POTE = {
   "pote-1-kilo": 4,
-  "pote-1-2-kilo": 3,
+  "pote-1-2-kilo": 4,
   "pote-1-4-kilo": 3,
 };
 
 // Precio unitario de cada paleta (por ahora todas al mismo precio)
-export const PRECIO_PALETA = 5050;
+export const PRECIO_PALETA = 6000;
 
 // Precio según el tamaño de torta
 export const PRECIO_TORTA = {

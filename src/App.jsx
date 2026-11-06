@@ -89,7 +89,7 @@ function App() {
     }, 800);
   }
 
-  // FUNCIÓN PROFESIONAL DE IMPRESIÓN DIRECTA POR VENTANA EMERGENTE (Cero errores de CSS)
+  // FUNCIÓN DE IMPRESIÓN CON @page PARA ROLLO TÉRMICO DE 80MM
   function imprimirComandaTermica(pedidoInfo) {
     const ventanaImpresion = window.open('', '_blank', 'width=400,height=600');
     
@@ -98,6 +98,10 @@ function App() {
         <head>
           <title>Comanda - Heladería S'MO</title>
           <style>
+            @page {
+              size: 80mm auto;
+              margin: 0;
+            }
             body {
               font-family: 'Courier New', Courier, monospace;
               font-size: 12px;
@@ -105,7 +109,7 @@ function App() {
               color: black;
               width: 78mm;
               margin: 0;
-              padding: 5px;
+              padding: 4px;
             }
             .text-center { text-align: center; }
             .bold { font-weight: bold; }
@@ -224,7 +228,6 @@ function App() {
 
       setPedidoConfirmado(true);
 
-      // Disparamos la comanda térmica limpia en la impresora
       imprimirComandaTermica({
         cliente: datosCliente,
         items: items,
