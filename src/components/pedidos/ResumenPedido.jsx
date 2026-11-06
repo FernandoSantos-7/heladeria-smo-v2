@@ -31,6 +31,13 @@ export default function ResumenPedido({
                 {it.nombre}
               </p>
 
+              {/* Muestra los gustos seleccionados si existen */}
+              {it.gustos && it.gustos.length > 0 && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Gustos: {it.gustos.map(g => g.nombre || g).join(", ")}
+                </p>
+              )}
+
               {it.tipo === "blister" && (
                 <p className="text-xs text-gray-500 mt-1">
                   {it.cantidad} {it.cantidad === 1 ? "blíster" : "blísteres"} ({it.unidades} unidades)
