@@ -39,5 +39,4 @@ To run the full-stack application locally with database support:
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/FernandoSantos-7/heladeria-smo-v2.git](https://github.com/FernandoSantos-7/heladeria-smo-v2.git)
-   cd heladeria-smo-v2
+   git clone https://github.com/FernandoSantos-7/heladeria-smo-v2.git
