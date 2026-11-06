@@ -155,95 +155,40 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative">
       
-      {/* ESTILOS CSS CLAVE PARA MOSTRAR SOLO LA COMANDA AL IMPRIMIR */}
+      {/* ESTILOS CSS DEFINITIVOS PARA LA COMANDA TÉRMICA */}
       <style>{`
-        /* Por defecto, la comanda no se ve en la pantalla normal */
-        #comanda-termica {
+        /* Ocultamos la comanda en la pantalla normal para que el cliente no la vea */
+        .comanda-impresion {
           display: none;
         }
 
         @media print {
-          /* Ocultamos toda la página web */
+          /* Ocultamos todo el cuerpo de la página */
           body * {
-            visibility: hidden !important;
             display: none !important;
           }
-          /* Hacemos visible y forzamos el bloque de la comanda */
-          #comanda-termica, #comanda-termica * {
-            visibility: visible !important;
+          /* Forzamos que únicamente se muestre la comanda térmica */
+          .comanda-impresion, .comanda-impresion * {
             display: block !important;
+            visibility: visible !important;
           }
-          #comanda-termica {
+          .comanda-impresion {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
-            width: 80mm !important;
+            width: 78mm !important;
             margin: 0 !important;
             padding: 2mm !important;
             font-family: 'Courier New', Courier, monospace !important;
             font-size: 12px !important;
+            line-height: 1.2 !important;
             color: black !important;
             background: white !important;
           }
         }
       `}</style>
-
-      {/* COMANDA / TICKET DETALLADO PARA LA 3NSTAR */}
-      <div id="comanda-termica">
-        <div style={{ width: "100%", textAlign: "left", lineHeight: "1.3" }}>
-          <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", marginBottom: "4px" }}>
-            *** HELADERÍA S'MO ***
-          </div>
-          <div style={{ textAlign: "center", fontSize: "10px", marginBottom: "6px" }}>
-            {new Date().toLocaleString()}
-          </div>
-          <div>------------------------------------</div>
-          <div style={{ fontSize: "11px", margin: "4px 0" }}>
-            <strong>Cliente:</strong> {datosCliente.nombre || "Mostrador"}<br/>
-            <strong>Tel:</strong> {datosCliente.telefono || "-"}<br/>
-            <strong>Dirección:</strong> {datosCliente.direccion || "Retira en local"}
-          </div>
-          <div>------------------------------------</div>
-          <div style={{ fontWeight: "bold", fontSize: "12px", margin: "4px 0" }}>DETALLE DE PEDIDO:</div>
-          {items.map((it, idx) => (
-            <div key={idx} style={{ fontSize: "12px", marginBottom: "6px", borderBottom: "1px dashed #666", paddingBottom: "4px" }}>
-              <div><strong>{it.cantidad}x {it.nombre}</strong></div>
-              {it.gustos && (
-                <div style={{ fontSize: "11px", marginTop: "2px", paddingLeft: "6px" }}>
-                  <strong>Gustos:</strong> {it.gustos}
-                </div>
-              )}
-              <div style={{ fontSize: "11px", marginTop: "2px", textAlign: "right" }}>
-                Subtotal: ${it.precio * it.cantidad}
-              </div>
-            </div>
-          ))}
-
-          {notasCliente.trim() !== "" && (
-            <>
-              <div>------------------------------------</div>
-              <div style={{ fontSize: "11px", margin: "4px 0" }}>
-                <strong>OBSERVACIONES:</strong><br/>
-                {notasCliente}
-              </div>
-            </>
-          )}
-
-          <div>------------------------------------</div>
-          <div style={{ fontSize: "11px", margin: "4px 0" }}>
-            <strong>Método de pago:</strong> {metodoPago}
-          </div>
-          <div style={{ fontSize: "13px", fontWeight: "bold", marginTop: "4px" }}>
-            TOTAL A PAGAR: ${total.toLocaleString()}
-          </div>
-          <div>------------------------------------</div>
-          <div style={{ textAlign: "center", fontSize: "10px", marginTop: "6px" }}>
-            ¡Gracias por tu compra! 🍦
-          </div>
-        </div>
-      </div>
 
       {/* DISEÑO VISUAL DE LA TIENDA */}
       <div
@@ -405,6 +350,60 @@ function App() {
           )}
         </main>
       </div>
+
+      {/* TICKET / COMANDA TÉRMICA FUERA DE LOS CONTENEDORES CON OVERFLOW */}
+      <div className="comanda-impresion">
+        <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", marginBottom: "4px" }}>
+          *** HELADERÍA S'MO ***
+        </div>
+        <div style={{ textAlign: "center", fontSize: "10px", marginBottom: "6px" }}>
+          {new Date().toLocaleString()}
+        </div>
+        <div>----------------------------------------</div>
+        <div style={{ fontSize: "11px", margin: "4px 0" }}>
+          <strong>Cliente:</strong> {datosCliente.nombre || "Mostrador"}<br/>
+          <strong>Tel:</strong> {datosCliente.telefono || "-"}<br/>
+          <strong>Dirección:</strong> {datosCliente.direccion || "Retira en local"}
+        </div>
+        <div>----------------------------------------</div>
+        <div style={{ fontWeight: "bold", fontSize: "12px", margin: "4px 0" }}>DETALLE DE PEDIDO:</div>
+        {items.map((it, idx) => (
+          <div key={idx} style={{ fontSize: "12px", marginBottom: "6px", borderBottom: "1px dashed #666", paddingBottom: "4px" }}>
+            <div><strong>{it.cantidad}x {it.nombre}</strong></div>
+            {it.gustos && (
+              <div style={{ fontSize: "11px", marginTop: "2px", paddingLeft: "6px" }}>
+                <strong>Gustos:</strong> {it.gustos}
+              </div>
+            )}
+            <div style={{ fontSize: "11px", marginTop: "2px", textAlign: "right" }}>
+              Subtotal: ${it.precio * it.cantidad}
+            </div>
+          </div>
+        ))}
+
+        {notasCliente.trim() !== "" && (
+          <>
+            <div>----------------------------------------</div>
+            <div style={{ fontSize: "11px", margin: "4px 0" }}>
+              <strong>OBSERVACIONES:</strong><br/>
+              {notasCliente}
+            </div>
+          </>
+        )}
+
+        <div>----------------------------------------</div>
+        <div style={{ fontSize: "11px", margin: "4px 0" }}>
+          <strong>Método de pago:</strong> {metodoPago}
+        </div>
+        <div style={{ fontSize: "13px", fontWeight: "bold", marginTop: "4px" }}>
+          TOTAL A PAGAR: ${total.toLocaleString()}
+        </div>
+        <div>----------------------------------------</div>
+        <div style={{ textAlign: "center", fontSize: "10px", marginTop: "6px" }}>
+          ¡Gracias por tu compra! 🍦
+        </div>
+      </div>
+
     </div>
   );
 }
