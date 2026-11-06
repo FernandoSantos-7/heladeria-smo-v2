@@ -1,21 +1,29 @@
-
 ================================
-          HELADERIA S&MO        
+         HELADERIA S&MO         
 ================================
-Pedido Nro: 25
-Fecha: 21/10/2026 22:47
-Cliente: Fernando Santos
+Pedido Nro: 50
+Fecha: 26/10/2026 23:44
+Cliente: Fernando Ezequiel
 Teléfono: 1154229565
-Dirección: olavarria123
+Dirección: olavarria 854
 --------------------------------
 DETALLE:
-- 1x Pote 1/4 KG (Banana Split) ($8000.00)
-  Gustos: Pote 1/4 KG (Banana Split)
-- 1x Pote 1 KG (Banana) ($25000.00)
-  Gustos: Pote 1 KG (Banana)
+- 1x Paleta de Vainilla
+($5050.00)
+- 1x Pote 1/4 KG (Candy)
+($8000.00)
+  Gustos: Pote 1/4 KG (Candy)
+- 1x Pote 1 KG (Chocolate
+Amargo) ($25000.00)
+  Gustos: Pote 1 KG (Chocolate
+  Amargo)
+- 1x Pote 1/2 KG (Chocolate
+Blanco) ($15000.00)
+  Gustos: Pote 1/2 KG (Chocolate
+  Blanco)
 --------------------------------
-TOTAL: $33000.00
-Método de Pago: Mercado Pago
+TOTAL: $53050.00
+Método de Pago: Efectivo
 ================================
       ¡GRACIAS POR SU COMPRA!   
 ================================

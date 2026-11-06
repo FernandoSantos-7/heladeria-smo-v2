@@ -16,20 +16,25 @@ import logoMercadoPago from "./assets/mercadopago.png";
 import SeccionBlister from "./components/blister/SeccionBlister";
 import SeccionVasitos from "./components/vasitos/SeccionVasitos";
 import SeccionCafeteria from "./components/cafeteria/SeccionCafeteria";
-import FooterLocal from "./components/layout/FooterLocal";
+import { Check } from "lucide-react";
 
 const ID_POTE_CUARTO = "pote-1-4-kilo";
 const MINIMO_POTE_CUARTO = 2;
 const WHATSAPP_NUMERO = "5491154229565";
+
+const API_URL = import.meta.env.VITE_BACKEND_URL || "https://heladeria-smo-v2.onrender.com";
 
 function App() {
   const [seccionActiva, setSeccionActiva] = useState("potes");
   const [poteElegido, setPoteElegido] = useState(null);
   const [gustosElegidos, setGustosElegidos] = useState([]);
   const [datosCliente, setDatosCliente] = useState({ nombre: "", telefono: "", direccion: "" });
+  const [notasCliente, setNotasCliente] = useState("");
   const [errores, setErrores] = useState({});
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
   const [metodoPago, setMetodoPago] = useState("Efectivo");
+
+  const [agregadoPote, setAgregadoPote] = useState(false);
 
   const {
     items,
@@ -45,10 +50,8 @@ function App() {
     .filter((it) => it.id === ID_POTE_CUARTO)
     .reduce((acc, it) => acc + it.cantidad, 0);
 
-  // ¿Hay algún producto que NO sea un pote de 1/4?
   const hayOtrosProductos = items.some((it) => it.id !== ID_POTE_CUARTO);
 
-  // La restricción solo aplica cuando el pedido tiene únicamente potes de 1/4
   const faltanCuartos =
     cantidadPoteCuarto > 0 &&
     cantidadPoteCuarto < MINIMO_POTE_CUARTO &&
@@ -62,13 +65,109 @@ function App() {
   function agregarAlCarrito() {
     if (!poteElegido || gustosElegidos.length === 0) return;
 
-    agregarItem({
-      id: `${poteElegido.id}-${gustosElegidos.join("-")}`,
-      productoId: poteElegido.id,
-      tipo: "pote",
-      nombre: `${poteElegido.nombre} (${gustosElegidos.join(", ")})`,
-      precio: poteElegido.precio,
+    const itemId = `${poteElegido.id}-${gustosElegidos.join("-")}`;
+    const itemExistente = items.find((it) => it.id === itemId);
+
+    if (itemExistente) {
+      cambiarCantidad(itemId, itemExistente.cantidad + 1);
+    } else {
+      agregarItem({
+        id: itemId,
+        productoId: poteElegido.id,
+        tipo: "pote",
+        nombre: `${poteElegido.nombre}`,
+        gustos: gustosElegidos.join(", "),
+        precio: poteElegido.precio,
+      });
+    }
+
+    setAgregadoPote(true);
+
+    setTimeout(() => {
+      setGustosElegidos([]);
+      setAgregadoPote(false);
+    }, 800);
+  }
+
+  // FUNCIÓN DE IMPRESIÓN CON @page PARA ROLLO TÉRMICO DE 80MM
+  function imprimirComandaTermica(pedidoInfo) {
+    const ventanaImpresion = window.open('', '_blank', 'width=400,height=600');
+    
+    let htmlContenido = `
+      <html>
+        <head>
+          <title>Comanda - Heladería S'MO</title>
+          <style>
+            @page {
+              size: 80mm auto;
+              margin: 0;
+            }
+            body {
+              font-family: 'Courier New', Courier, monospace;
+              font-size: 12px;
+              line-height: 1.3;
+              color: black;
+              width: 78mm;
+              margin: 0;
+              padding: 4px;
+            }
+            .text-center { text-align: center; }
+            .bold { font-weight: bold; }
+            .line { border-bottom: 1px dashed black; margin: 6px 0; }
+            .right { text-align: right; }
+          </style>
+        </head>
+        <body>
+          <div class="text-center bold" style="font-size: 14px;">*** HELADERÍA S'MO ***</div>
+          <div class="text-center" style="font-size: 10px; margin-bottom: 4px;">${new Date().toLocaleString()}</div>
+          <div class="line"></div>
+          <div>
+            <strong>Cliente:</strong> ${pedidoInfo.cliente.nombre || "Mostrador"}<br/>
+            <strong>Tel:</strong> ${pedidoInfo.cliente.telefono || "-"}<br/>
+            <strong>Dirección:</strong> ${pedidoInfo.cliente.direccion || "Retira en local"}
+          </div>
+          <div class="line"></div>
+          <div class="bold">DETALLE DE PEDIDO:</div>
+    `;
+
+    pedidoInfo.items.forEach(it => {
+      htmlContenido += `
+        <div style="margin-bottom: 6px;">
+          <div class="bold">${it.cantidad}x ${it.nombre}</div>
+          ${it.gustos ? `<div style="padding-left: 10px; font-size: 11px;">Gustos: ${it.gustos}</div>` : ''}
+          <div class="right" style="font-size: 11px;">Subtotal: $${it.precio * it.cantidad}</div>
+        </div>
+      `;
     });
+
+    if (pedidoInfo.notas && pedidoInfo.notas.trim() !== "") {
+      htmlContenido += `
+        <div class="line"></div>
+        <div>
+          <strong>OBSERVACIONES (Lucas):</strong><br/>
+          ${pedidoInfo.notas}
+        </div>
+      `;
+    }
+
+    htmlContenido += `
+          <div class="line"></div>
+          <div><strong>Método de pago:</strong> ${pedidoInfo.metodoPago}</div>
+          <div class="bold" style="font-size: 13px; margin-top: 4px;">TOTAL A PAGAR: $${pedidoInfo.total.toLocaleString()}</div>
+          <div class="line"></div>
+          <div class="text-center" style="font-size: 10px; margin-top: 6px;">¡Gracias por tu compra! 🍦</div>
+        </body>
+      </html>
+    `;
+
+    ventanaImpresion.document.write(htmlContenido);
+    ventanaImpresion.document.close();
+    ventanaImpresion.focus();
+    
+    setTimeout(() => {
+      ventanaImpresion.print();
+      ventanaImpresion.close();
+    }, 300);
   }
 
   async function confirmarPedido() {
@@ -80,7 +179,6 @@ function App() {
     if (faltanCuartos) return;
 
     try {
-      // 1. Armamos el objeto con los datos que espera Django
       const pedidoData = {
         nombre_cliente: datosCliente.nombre,
         telefono: datosCliente.telefono,
@@ -93,12 +191,11 @@ function App() {
           producto_nombre: it.nombre,
           cantidad: it.cantidad,
           precio_unitario: it.precio,
-          gustos: it.tipo === "pote" ? it.nombre : "",
+          gustos: it.gustos || "",
         })),
       };
 
-      // 2. Guardamos el pedido en el backend de Django
-      const respuesta = await fetch("http://127.0.0.1:8000/api/pedidos/", {
+      const respuesta = await fetch(`${API_URL}/api/pedidos/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,9 +207,8 @@ function App() {
 
       const pedidoCreado = await respuesta.json();
 
-      // 3. Si eligió Mercado Pago, pedimos la preferencia y lo redirigimos
       if (metodoPago === "Mercado Pago") {
-        const respMp = await fetch("http://127.0.0.1:8000/api/crear-preferencia/", {
+        const respMp = await fetch(`${API_URL}/api/crear-preferencia/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -121,7 +217,6 @@ function App() {
         });
 
         const datosMp = await respMp.json();
-        console.log("Lo que respondió Django:", datosMp);
 
         if (datosMp.init_point) {
           window.location.href = datosMp.init_point;
@@ -131,12 +226,16 @@ function App() {
         }
       }
 
-      // 4. Si es efectivo o transferencia, disparamos la impresión normal
-      await fetch(`http://127.0.0.1:8000/api/pedidos/${pedidoCreado.id}/imprimir/`, {
-        method: "POST",
+      setPedidoConfirmado(true);
+
+      imprimirComandaTermica({
+        cliente: datosCliente,
+        items: items,
+        total: total,
+        metodoPago: metodoPago,
+        notas: notasCliente
       });
 
-      setPedidoConfirmado(true);
     } catch (error) {
       console.error(error);
       alert("Hubo un error al registrar o imprimir el pedido.");
@@ -144,7 +243,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -179,9 +278,20 @@ function App() {
               {poteElegido && gustosElegidos.length > 0 && (
                 <button
                   onClick={agregarAlCarrito}
-                  className="w-full bg-[#4a5d4a] text-white font-bold py-3 rounded-xl mb-6 hover:bg-[#3d4d3d] transition"
+                  className={`w-full rounded-xl py-3 font-bold text-white transition-all duration-200 active:scale-95 shadow-md mb-6 flex items-center justify-center gap-2 ${
+                    agregadoPote 
+                      ? "bg-green-500 scale-95" 
+                      : "bg-[#4a5d4a] hover:bg-[#3d4d3d]"
+                  }`}
                 >
-                  Agregar al pedido
+                  {agregadoPote ? (
+                    <>
+                      <span>¡Agregado con éxito!</span>
+                      <Check size={18} className="stroke-[3]" />
+                    </>
+                  ) : (
+                    "Agregar al pedido"
+                  )}
                 </button>
               )}
             </>
@@ -231,45 +341,48 @@ function App() {
                 onCambiarDatos={setDatosCliente}
                 errores={errores}
               />
-              {/* Selector de Método de Pago */}
-              <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-2">Método de pago:</label>
-                <div className="flex gap-4">
+
+              <div className="mb-6">
+                <label className="block text-gray-800 font-bold mb-2 text-sm">
+                  Notas o aclaraciones para el pedido (Opcional):
+                </label>
+                <textarea
+                  value={notasCliente}
+                  onChange={(e) => setNotasCliente(e.target.value)}
+                  placeholder="Ej: Poneme más cantidad del gusto Dubai, por favor..."
+                  className="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#4a5d4a] text-sm bg-white"
+                  rows="2"
+                />
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-gray-800 font-bold mb-3 text-lg">Método de pago:</label>
+                <div className="grid grid-cols-2 gap-4">
                   <button
                     type="button"
                     onClick={() => setMetodoPago("Efectivo")}
-                    className={`px-4 py-2 rounded-lg font-medium border ${
-                      metodoPago === "Efectivo" 
-                        ? "bg-green-700 text-white border-green-700" 
-                        : "bg-white text-gray-700 border-gray-300"
+                    className={`p-4 rounded-xl font-semibold border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
+                      metodoPago === "Efectivo"
+                        ? "bg-emerald-50 border-emerald-600 text-emerald-800 shadow-md ring-2 ring-emerald-600/20"
+                        : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                     }`}
                   >
-                    💵 Efectivo
+                    <span className="text-2xl">💵</span>
+                    <span className="text-base">Efectivo</span>
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setMetodoPago("Transferencia")}
-                    className={`px-4 py-2 rounded-lg font-medium border ${
-                      metodoPago === "Transferencia" 
-                        ? "bg-green-700 text-white border-green-700" 
-                        : "bg-white text-gray-700 border-gray-300"
+                    onClick={() => setMetodoPago("Mercado Pago")}
+                    className={`p-4 rounded-xl font-semibold border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
+                      metodoPago === "Mercado Pago"
+                        ? "bg-sky-50 border-sky-500 text-sky-900 shadow-md ring-2 ring-sky-500/20"
+                        : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                     }`}
                   >
-                    📱 Transferencia
+                    <img src={logoMercadoPago} alt="Mercado Pago" className="w-48 h-22 object-contain" />
+                    <span className="text-base">Mercado Pago</span>
                   </button>
-
-                <button
-                  type="button"
-                  onClick={() => setMetodoPago("Mercado Pago")}
-                 className={`p-2 rounded-lg font-medium border flex items-center justify-center ${
-                 metodoPago === "Mercado Pago"
-                  ? "bg-green-700 text-white border-green-700"
-                 : "bg-white text-gray-700 border-gray-300"
-                 }`}
-                >
-                 <img src={logoMercadoPago} alt="Mercado Pago" className="w-40 h-20 object-contain mx-auto" />
-                 </button>
                 </div>
               </div>
 
@@ -283,12 +396,11 @@ function App() {
 
               {pedidoConfirmado && (
                 <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
-                  ¡Pedido confirmado! (Acá en el próximo paso lo mandamos por WhatsApp)
+                  ¡Pedido confirmado y comanda enviada a la impresora!
                 </p>
               )}
             </>
           )}
-          <FooterLocal />
         </main>
       </div>
     </div>

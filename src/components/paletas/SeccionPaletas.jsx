@@ -1,19 +1,32 @@
 // src/components/paletas/SeccionPaletas.jsx
 import { useState } from "react";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Check } from "lucide-react";
 import { paletas } from "../../data/paletas";
 import { PRECIO_PALETA } from "../../constants/config";
 
-
 const categorias = [...new Set(paletas.map((p) => p.categoria))];
 
+// Colores vibrantes y efecto luminoso para las paletas y sus modales
 const CATEGORIA_COLOR = {
-  Crema: "border-l-[#7a6a8a]",
-  Agua: "border-l-[#3b8a86]",
+  Crema: {
+    borde: "border-l-[#8A2BE2]", // Violeta eléctrico/fluo
+    hover: "hover:border-[#8A2BE2] hover:bg-[#8A2BE2]/10 hover:shadow-[0_0_20px_rgba(138,43,226,0.4)]",
+    hoverItem: "hover:border-[#8A2BE2] hover:bg-[#8A2BE2]/10 cursor-pointer",
+  },
+  Agua: {
+    borde: "border-l-[#00CED1]", // Turquesa/celeste fluo fresco
+    hover: "hover:border-[#00CED1] hover:bg-[#00CED1]/10 hover:shadow-[0_0_20px_rgba(0,206,209,0.4)]",
+    hoverItem: "hover:border-[#00CED1] hover:bg-[#00CED1]/10 cursor-pointer",
+  },
 };
 
 export default function SeccionPaletas({ onAgregarAlCarrito }) {
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
+  const [agregandoId, setAgregandoId] = useState(null);
+
+  const estiloActual = CATEGORIA_COLOR[categoriaAbierta] || {
+    hoverItem: "hover:border-gray-400 hover:bg-gray-50 cursor-pointer",
+  };
 
   return (
     <section className="mb-6">
@@ -21,13 +34,16 @@ export default function SeccionPaletas({ onAgregarAlCarrito }) {
 
       <div className="grid grid-cols-2 gap-3">
         {categorias.map((cat) => {
-          const colorBorde = CATEGORIA_COLOR[cat] ?? "border-l-gray-300";
+          const configCat = CATEGORIA_COLOR[cat] || {};
+          const colorBorde = configCat.borde || "border-l-gray-300";
+          const hoverEfecto = configCat.hover || "hover:border-gray-400";
           const cantidad = paletas.filter((p) => p.categoria === cat).length;
+          
           return (
             <button
               key={cat}
               onClick={() => setCategoriaAbierta(cat)}
-              className={`bg-white border border-gray-200 border-l-4 ${colorBorde} text-left p-4 rounded-xl transition hover:shadow-md`}
+              className={`bg-white border border-gray-200 border-l-4 ${colorBorde} text-left p-4 rounded-xl transition ${hoverEfecto} hover:shadow-md active:scale-95`}
             >
               <p className="font-bold text-sm text-gray-800">Paleta de {cat}</p>
               <p className="text-[11px] text-gray-400">{cantidad} variedades</p>
@@ -50,7 +66,7 @@ export default function SeccionPaletas({ onAgregarAlCarrito }) {
               <button
                 onClick={() => setCategoriaAbierta(null)}
                 aria-label="Cerrar"
-                className="text-gray-400"
+                className="text-gray-400 hover:text-gray-600 transition"
               >
                 <X size={20} />
               </button>
@@ -59,36 +75,56 @@ export default function SeccionPaletas({ onAgregarAlCarrito }) {
             <div className="overflow-y-auto space-y-2 p-4">
               {paletas
                 .filter((p) => p.categoria === categoriaAbierta)
-                .map((p) => (
-                  <div
-                    key={p.id}
-                    className="w-full text-left p-3 rounded-lg border border-gray-200 flex justify-between items-start gap-2"
-                  >
-                    <div>
-                      <p className="font-bold text-sm text-gray-800">{p.nombre}</p>
-                      <p className="text-xs text-gray-500">{p.descripcion}</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        ${PRECIO_PALETA.toLocaleString("es-AR")}
-                      </p>
-                    </div>
-                    <button
-                       onClick={() => {
-                       onAgregarAlCarrito({
-                       id: `paleta-${p.id}`,
-                       tipo: "paleta",
-                       nombre: p.nombre,
-                       precio: PRECIO_PALETA,
-                         });
+                .map((p) => {
+                  const estaAgregando = agregandoId === p.id;
 
-                       setCategoriaAbierta(null);
-                       }}
-                      className="shrink-0 bg-[#4a5d4a] text-white rounded-full p-2"
-                      aria-label={`Agregar ${p.nombre}`}
+                  const agregarItem = () => {
+                    if (estaAgregando) return;
+                    
+                    onAgregarAlCarrito({
+                      id: `paleta-${p.id}`,
+                      tipo: "paleta",
+                      nombre: p.nombre,
+                      precio: PRECIO_PALETA,
+                    });
+
+                    setAgregandoId(p.id);
+                    setTimeout(() => {
+                      setAgregandoId(null);
+                      setCategoriaAbierta(null);
+                    }, 600);
+                  };
+
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={agregarItem}
+                      className={`w-full text-left p-3 rounded-lg border border-gray-200 flex justify-between items-start gap-2 transition active:scale-[0.98] ${estiloActual.hoverItem}`}
                     >
-                      <Plus size={16} />
-                    </button>
-                  </div>
-                ))}
+                      <div>
+                        <p className="font-bold text-sm text-gray-800">{p.nombre}</p>
+                        <p className="text-xs text-gray-500">{p.descripcion}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          ${PRECIO_PALETA.toLocaleString("es-AR")}
+                        </p>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Evita doble ejecución
+                          agregarItem();
+                        }}
+                        className={`shrink-0 rounded-full p-2 transition shadow-sm flex items-center justify-center ${
+                          estaAgregando
+                            ? "bg-green-500 text-white scale-105"
+                            : "bg-[#4a5d4a] text-white hover:bg-[#3b4d3b]"
+                        }`}
+                        aria-label={`Agregar ${p.nombre}`}
+                      >
+                        {estaAgregando ? <Check size={16} /> : <Plus size={16} />}
+                      </button>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>
