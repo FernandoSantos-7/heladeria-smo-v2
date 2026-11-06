@@ -34,9 +34,6 @@ function App() {
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
   const [metodoPago, setMetodoPago] = useState("Efectivo");
 
-  // Estado temporal para guardar los datos del último pedido impreso
-  const [ultimoPedido, setUltimoPedido] = useState(null);
-
   // Estado local para la animación de éxito del botón en potes
   const [agregadoPote, setAgregadoPote] = useState(false);
 
@@ -79,7 +76,8 @@ function App() {
         id: itemId,
         productoId: poteElegido.id,
         tipo: "pote",
-        nombre: `${poteElegido.nombre} (${gustosElegidos.join(", ")})`,
+        nombre: `${poteElegido.nombre}`,
+        gustos: gustosElegidos.join(", "),
         precio: poteElegido.precio,
       });
     }
@@ -102,16 +100,6 @@ function App() {
     if (!cumpleMinimo) return;
     if (faltanCuartos) return;
 
-    // Guardamos copia de los datos actuales para el ticket antes de procesar
-    const datosPedidoActual = {
-      cliente: { ...datosCliente },
-      items: [...items],
-      total: total,
-      metodoPago: metodoPago,
-      fecha: new Date().toLocaleString(),
-    };
-    setUltimoPedido(datosPedidoActual);
-
     try {
       const pedidoData = {
         nombre_cliente: datosCliente.nombre,
@@ -125,7 +113,7 @@ function App() {
           producto_nombre: it.nombre,
           cantidad: it.cantidad,
           precio_unitario: it.precio,
-          gustos: it.tipo === "pote" ? it.nombre : "",
+          gustos: it.gustos || "",
         })),
       };
 
@@ -161,10 +149,9 @@ function App() {
       }
 
       setPedidoConfirmado(true);
-      // Disparamos la impresión limpia en la 3nStar
-      setTimeout(() => {
-        window.print();
-      }, 300);
+      
+      // Disparamos la impresión directa de la comanda
+      window.print();
 
     } catch (error) {
       console.error(error);
@@ -175,22 +162,22 @@ function App() {
   return (
     <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative overflow-hidden">
       
-      {/* ESTILOS CSS EXCLUSIVOS PARA IMPRESIÓN TÉRMICA (3nStar) */}
+      {/* ESTILOS CSS EXCLUSIVOS PARA LA COMANDA TÉRMICA (3nStar) */}
       <style>{`
         @media print {
           body * {
             visibility: hidden !important;
           }
-          #ticket-impresion-termica, #ticket-impresion-termica * {
+          #comanda-termica, #comanda-termica * {
             visibility: visible !important;
           }
-          #ticket-impresion-termica {
+          #comanda-termica {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
             width: 80mm !important;
             margin: 0 !important;
-            padding: 5px !important;
+            padding: 2mm !important;
             font-family: 'Courier New', Courier, monospace !important;
             font-size: 12px !important;
             color: black !important;
@@ -199,45 +186,45 @@ function App() {
         }
       `}</style>
 
-      {/* TICKET OCULTO EXCLUSIVO PARA LA IMPRESORA TÉRMICA */}
-      <div id="ticket-impresion-termica" className="hidden">
-        {ultimoPedido && (
-          <div style={{ width: "100%", textAlign: "left", lineHeight: "1.2" }}>
-            <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", marginBottom: "6px" }}>
-              HELADERÍA S'MO
-            </div>
-            <div style={{ textAlign: "center", fontSize: "10px", marginBottom: "8px" }}>
-              Av. Boulogne Sur Mer 1099<br/>
-              Tapiales, Buenos Aires
-            </div>
-            <div>------------------------------------</div>
-            <div style={{ fontSize: "11px", margin: "4px 0" }}>
-              <strong>Fecha:</strong> {ultimoPedido.fecha}<br/>
-              <strong>Cliente:</strong> {ultimoPedido.cliente.nombre}<br/>
-              <strong>Tel:</strong> {ultimoPedido.cliente.telefono}<br/>
-              <strong>Dirección:</strong> {ultimoPedido.cliente.direccion}
-            </div>
-            <div>------------------------------------</div>
-            <div style={{ fontWeight: "bold", fontSize: "11px", margin: "4px 0" }}>DETALLE DEL PEDIDO:</div>
-            {ultimoPedido.items.map((it, idx) => (
-              <div key={idx} style={{ fontSize: "11px", marginBottom: "4px" }}>
-                - {it.cantidad}x {it.nombre} (${it.precio * it.cantidad})
-              </div>
-            ))}
-            <div>------------------------------------</div>
-            <div style={{ fontSize: "11px", margin: "4px 0" }}>
-              <strong>Método de pago:</strong> {ultimoPedido.metodoPago}
-            </div>
-            <div style={{ fontSize: "13px", fontWeight: "bold", marginTop: "6px" }}>
-              TOTAL: ${ultimoPedido.total.toLocaleString()}
-            </div>
-            <div>------------------------------------</div>
-            <div style={{ textAlign: "center", fontSize: "10px", marginTop: "8px" }}>
-              ¡Gracias por tu compra!<br/>
-              S'MO - La dulce tentación
-            </div>
+      {/* COMANDA / TICKET PARA EL MOSTRADOR (Siempre en el DOM, oculto en pantalla) */}
+      <div id="comanda-termica" className="hidden">
+        <div style={{ width: "100%", textAlign: "left", lineHeight: "1.2" }}>
+          <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", marginBottom: "4px" }}>
+            *** COMANDA S'MO ***
           </div>
-        )}
+          <div style={{ textAlign: "center", fontSize: "10px", marginBottom: "6px" }}>
+            {new Date().toLocaleString()}
+          </div>
+          <div>------------------------------------</div>
+          <div style={{ fontSize: "11px", margin: "4px 0" }}>
+            <strong>Cliente:</strong> {datosCliente.nombre || "Mostrador"}<br/>
+            <strong>Tel:</strong> {datosCliente.telefono || "-"}<br/>
+            <strong>Dirección:</strong> {datosCliente.direccion || "Retira en local"}
+          </div>
+          <div>------------------------------------</div>
+          <div style={{ fontWeight: "bold", fontSize: "12px", margin: "4px 0" }}>DETALLE PARA PREPARAR:</div>
+          {items.map((it, idx) => (
+            <div key={idx} style={{ fontSize: "12px", marginBottom: "6px", borderBottom: "1px dashed #666", paddingBottom: "4px" }}>
+              <div><strong>{it.cantidad}x {it.nombre}</strong></div>
+              {it.gustos && (
+                <div style={{ fontSize: "11px", marginTop: "2px", paddingLeft: "6px" }}>
+                  <strong>Gustos:</strong> {it.gustos}
+                </div>
+              )}
+            </div>
+          ))}
+          <div>------------------------------------</div>
+          <div style={{ fontSize: "11px", margin: "4px 0" }}>
+            <strong>Método de pago:</strong> {metodoPago}
+          </div>
+          <div style={{ fontSize: "13px", fontWeight: "bold", marginTop: "4px" }}>
+            TOTAL A PAGAR: ${total.toLocaleString()}
+          </div>
+          <div>------------------------------------</div>
+          <div style={{ textAlign: "center", fontSize: "10px", marginTop: "6px" }}>
+            ¡A preparar con todo! 🍦
+          </div>
+        </div>
       </div>
 
       {/* FONDO Y DISEÑO DE LA APLICACIÓN WEB */}
@@ -379,7 +366,7 @@ function App() {
 
               {pedidoConfirmado && (
                 <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
-                  ¡Pedido confirmado e impreso correctamente en el mostrador!
+                  ¡Pedido confirmado y comanda enviada a la impresora!
                 </p>
               )}
             </>
