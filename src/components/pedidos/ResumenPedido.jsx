@@ -31,10 +31,10 @@ export default function ResumenPedido({
                 {it.nombre}
               </p>
 
-              {/* Muestra los gustos seleccionados si existen */}
-              {it.gustos && it.gustos.length > 0 && (
+              {/* Muestra los gustos seleccionados de forma segura sin romper la app */}
+              {Array.isArray(it.gustos) && it.gustos.length > 0 && (
                 <p className="text-xs text-gray-500 mt-1">
-                  Gustos: {it.gustos.map(g => g.nombre || g).join(", ")}
+                  Gustos: {it.gustos.map(g => typeof g === 'object' ? (g.nombre || JSON.stringify(g)) : g).join(", ")}
                 </p>
               )}
 
