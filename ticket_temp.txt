@@ -1,19 +1,28 @@
 ================================
          HELADERIA S&MO         
 ================================
-Pedido Nro: 48
-Fecha: 26/10/2026 23:09
-Cliente: Jorge
+Pedido Nro: 50
+Fecha: 26/10/2026 23:44
+Cliente: Fernando Ezequiel
 Teléfono: 1154229565
-Dirección: siempre viva 1234
+Dirección: olavarria 854
 --------------------------------
 DETALLE:
-- 1x Pote 1 KG (Chocolate al
-oporto con nuez) ($25000.00)
+- 1x Paleta de Vainilla
+($5050.00)
+- 1x Pote 1/4 KG (Candy)
+($8000.00)
+  Gustos: Pote 1/4 KG (Candy)
+- 1x Pote 1 KG (Chocolate
+Amargo) ($25000.00)
   Gustos: Pote 1 KG (Chocolate
-  al oporto con nuez)
+  Amargo)
+- 1x Pote 1/2 KG (Chocolate
+Blanco) ($15000.00)
+  Gustos: Pote 1/2 KG (Chocolate
+  Blanco)
 --------------------------------
-TOTAL: $25000.00
+TOTAL: $53050.00
 Método de Pago: Efectivo
 ================================
       ¡GRACIAS POR SU COMPRA!   

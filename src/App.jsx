@@ -16,12 +16,14 @@ import logoMercadoPago from "./assets/mercadopago.png";
 import SeccionBlister from "./components/blister/SeccionBlister";
 import SeccionVasitos from "./components/vasitos/SeccionVasitos";
 import SeccionCafeteria from "./components/cafeteria/SeccionCafeteria";
-import FooterLocal from "./components/layout/FooterLocal";
 import { Check } from "lucide-react";
 
 const ID_POTE_CUARTO = "pote-1-4-kilo";
 const MINIMO_POTE_CUARTO = 2;
 const WHATSAPP_NUMERO = "5491154229565";
+
+// URL dinámica que lee la variable de Vercel o usa Render por defecto
+const API_URL = import.meta.env.VITE_BACKEND_URL || "https://heladeria-smo-v2.onrender.com";
 
 function App() {
   const [seccionActiva, setSeccionActiva] = useState("potes");
@@ -114,7 +116,7 @@ function App() {
         })),
       };
 
-      const respuesta = await fetch("http://127.0.0.1:8000/api/pedidos/", {
+      const respuesta = await fetch(`${API_URL}/api/pedidos/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -127,7 +129,7 @@ function App() {
       const pedidoCreado = await respuesta.json();
 
       if (metodoPago === "Mercado Pago") {
-        const respMp = await fetch("http://127.0.0.1:8000/api/crear-preferencia/", {
+        const respMp = await fetch(`${API_URL}/api/crear-preferencia/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -145,7 +147,7 @@ function App() {
         }
       }
 
-      await fetch(`http://127.0.0.1:8000/api/pedidos/${pedidoCreado.id}/imprimir/`, {
+      await fetch(`${API_URL}/api/pedidos/${pedidoCreado.id}/imprimir/`, {
         method: "POST",
       });
 
@@ -301,7 +303,6 @@ function App() {
               )}
             </>
           )}
-          <FooterLocal />
         </main>
       </div>
     </div>
