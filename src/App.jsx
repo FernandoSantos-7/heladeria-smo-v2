@@ -29,7 +29,7 @@ function App() {
   const [poteElegido, setPoteElegido] = useState(null);
   const [gustosElegidos, setGustosElegidos] = useState([]);
   const [datosCliente, setDatosCliente] = useState({ nombre: "", telefono: "", direccion: "" });
-  const [notasCliente, setNotasCliente] = useState(""); // <--- Estado para las notas de Lucas
+  const [notasCliente, setNotasCliente] = useState("");
   const [errores, setErrores] = useState({});
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
   const [metodoPago, setMetodoPago] = useState("Efectivo");
@@ -157,14 +157,23 @@ function App() {
   return (
     <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative overflow-hidden">
       
-      {/* ESTILOS CSS PARA LA COMANDA TÉRMICA */}
+      {/* ESTILOS CSS CLAVE PARA MOSTRAR SOLO LA COMANDA AL IMPRIMIR */}
       <style>{`
+        /* Por defecto, la comanda no se ve en la pantalla normal */
+        #comanda-termica {
+          display: none;
+        }
+
         @media print {
+          /* Ocultamos toda la página web */
           body * {
             visibility: hidden !important;
+            display: none !important;
           }
+          /* Hacemos visible y forzamos el bloque de la comanda */
           #comanda-termica, #comanda-termica * {
             visibility: visible !important;
+            display: block !important;
           }
           #comanda-termica {
             position: absolute !important;
@@ -181,11 +190,11 @@ function App() {
         }
       `}</style>
 
-      {/* COMANDA / TICKET PARA EL MOSTRADOR */}
-      <div id="comanda-termica" className="hidden">
-        <div style={{ width: "100%", textAlign: "left", lineHeight: "1.2" }}>
+      {/* COMANDA / TICKET DETALLADO PARA LA 3NSTAR */}
+      <div id="comanda-termica">
+        <div style={{ width: "100%", textAlign: "left", lineHeight: "1.3" }}>
           <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", marginBottom: "4px" }}>
-            *** COMANDA S'MO ***
+            *** HELADERÍA S'MO ***
           </div>
           <div style={{ textAlign: "center", fontSize: "10px", marginBottom: "6px" }}>
             {new Date().toLocaleString()}
@@ -197,7 +206,7 @@ function App() {
             <strong>Dirección:</strong> {datosCliente.direccion || "Retira en local"}
           </div>
           <div>------------------------------------</div>
-          <div style={{ fontWeight: "bold", fontSize: "12px", margin: "4px 0" }}>DETALLE PARA PREPARAR:</div>
+          <div style={{ fontWeight: "bold", fontSize: "12px", margin: "4px 0" }}>DETALLE DE PEDIDO:</div>
           {items.map((it, idx) => (
             <div key={idx} style={{ fontSize: "12px", marginBottom: "6px", borderBottom: "1px dashed #666", paddingBottom: "4px" }}>
               <div><strong>{it.cantidad}x {it.nombre}</strong></div>
@@ -206,10 +215,12 @@ function App() {
                   <strong>Gustos:</strong> {it.gustos}
                 </div>
               )}
+              <div style={{ fontSize: "11px", marginTop: "2px", textAlign: "right" }}>
+                Subtotal: ${it.precio * it.cantidad}
+              </div>
             </div>
           ))}
 
-          {/* SECCIÓN DE NOTAS SI EL CLIENTE ESCRIBIÓ ALGO */}
           {notasCliente.trim() !== "" && (
             <>
               <div>------------------------------------</div>
@@ -229,11 +240,12 @@ function App() {
           </div>
           <div>------------------------------------</div>
           <div style={{ textAlign: "center", fontSize: "10px", marginTop: "6px" }}>
-            ¡A preparar con todo! 🍦
+            ¡Gracias por tu compra! 🍦
           </div>
         </div>
       </div>
 
+      {/* DISEÑO VISUAL DE LA TIENDA */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -332,7 +344,6 @@ function App() {
                 errores={errores}
               />
 
-              {/* CAMPO DE NOTAS / OBSERVACIONES PARA LUCAS */}
               <div className="mb-6">
                 <label className="block text-gray-800 font-bold mb-2 text-sm">
                   Notas o aclaraciones para el pedido (Opcional):
