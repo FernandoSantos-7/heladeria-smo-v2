@@ -20,76 +20,81 @@ export default function ResumenPedido({
       </h2>
 
       <div className="space-y-4">
-        {items.map((it, i) => (
-          <div
-            key={i}
-            className="flex justify-between items-start gap-3 border-b border-gray-200 pb-4"
-          >
-            <div className="flex-1">
+        {items.map((it, i) => {
+          // Captura los gustos sin importar si vienen en 'gustos' o en 'sabores'
+          const listaGustos = it.gustos || it.sabores || [];
 
-              <p className="font-semibold text-gray-800">
-                {it.nombre}
-              </p>
+          return (
+            <div
+              key={i}
+              className="flex justify-between items-start gap-3 border-b border-gray-200 pb-4"
+            >
+              <div className="flex-1">
 
-              {/* Muestra los gustos seleccionados de forma segura sin romper la app */}
-              {Array.isArray(it.gustos) && it.gustos.length > 0 && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Gustos: {it.gustos.map(g => typeof g === 'object' ? (g.nombre || JSON.stringify(g)) : g).join(", ")}
+                <p className="font-semibold text-gray-800">
+                  {it.nombre}
                 </p>
-              )}
 
-              {it.tipo === "blister" && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {it.cantidad} {it.cantidad === 1 ? "blíster" : "blísteres"} ({it.unidades} unidades)
+                {/* Muestra los gustos o sabores seleccionados de forma segura */}
+                {Array.isArray(listaGustos) && listaGustos.length > 0 && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Gustos: {listaGustos.map(g => typeof g === 'object' ? (g.nombre || JSON.stringify(g)) : g).join(", ")}
+                  </p>
+                )}
+
+                {it.tipo === "blister" && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {it.cantidad} {it.cantidad === 1 ? "blíster" : "blísteres"} ({it.unidades} unidades)
+                  </p>
+                )}
+
+                {it.tipo === "vasitos" && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {it.cantidad} vasitos comestibles
+                  </p>
+                )}
+
+                <p className="text-sm text-[#4a5d4a] font-medium mt-1">
+                  {it.precio === 0
+                    ? "Sin cargo"
+                    : `$${it.precio.toLocaleString("es-AR")}`}
                 </p>
-              )}
 
-              {it.tipo === "vasitos" && (
-                <p className="text-xs text-gray-500 mt-1">
-                  {it.cantidad} vasitos comestibles
-                </p>
-              )}
+              </div>
 
-              <p className="text-sm text-[#4a5d4a] font-medium mt-1">
-                {it.precio === 0
-                  ? "Sin cargo"
-                  : `$${it.precio.toLocaleString("es-AR")}`}
-              </p>
+              <div className="flex items-center gap-2">
+
+                <button
+                  onClick={() => onCambiarCantidad(i, it.cantidad - 1)}
+                  disabled={it.cantidad <= 1}
+                  className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 disabled:opacity-40 transition flex items-center justify-center"
+                >
+                  <Minus size={14} />
+                </button>
+
+                <span className="w-5 text-center font-semibold">
+                  {it.cantidad}
+                </span>
+
+                <button
+                  onClick={() => onCambiarCantidad(i, it.cantidad + 1)}
+                  className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 transition flex items-center justify-center"
+                >
+                  <Plus size={14} />
+                </button>
+
+                <button
+                  onClick={() => onQuitarItem(i)}
+                  className="w-8 h-8 rounded-full text-red-500 hover:bg-red-50 transition flex items-center justify-center"
+                >
+                  <Trash2 size={16} />
+                </button>
+
+              </div>
 
             </div>
-
-            <div className="flex items-center gap-2">
-
-              <button
-                onClick={() => onCambiarCantidad(i, it.cantidad - 1)}
-                disabled={it.cantidad <= 1}
-                className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 disabled:opacity-40 transition flex items-center justify-center"
-              >
-                <Minus size={14} />
-              </button>
-
-              <span className="w-5 text-center font-semibold">
-                {it.cantidad}
-              </span>
-
-              <button
-                onClick={() => onCambiarCantidad(i, it.cantidad + 1)}
-                className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100 transition flex items-center justify-center"
-              >
-                <Plus size={14} />
-              </button>
-
-              <button
-                onClick={() => onQuitarItem(i)}
-                className="w-8 h-8 rounded-full text-red-500 hover:bg-red-50 transition flex items-center justify-center"
-              >
-                <Trash2 size={16} />
-              </button>
-
-            </div>
-
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex justify-between items-center mt-5 pt-3 border-t text-lg font-bold text-gray-800">
