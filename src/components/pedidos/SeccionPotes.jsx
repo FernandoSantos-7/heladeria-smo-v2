@@ -14,7 +14,12 @@ export default function SeccionPotes({ poteElegido, onElegirPote }) {
         {productos.potes.map((p) => {
           const activo = poteElegido?.id === p.id;
           const aviso = AVISO_POR_POTE[p.id];
-          const limiteGustos = GUSTOS_POR_POTE[p.id] ?? 1;
+          
+          // Forzamos la lectura directa según el tipo de pote para evitar fallos de ID
+          let limiteGustos = 3;
+          if (p.id === "pote-1-kilo") limiteGustos = GUSTOS_POR_POTE["pote-1-kilo"] ?? 4;
+          if (p.id === "pote-1-2-kilo") limiteGustos = 4; // <--- ¡Aca clavamos el 4 del medio kilo a la fuerza!
+          if (p.id === "pote-1-4-kilo") limiteGustos = GUSTOS_POR_POTE["pote-1-4-kilo"] ?? 3;
 
           return (
             <button
