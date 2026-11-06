@@ -147,11 +147,8 @@ function App() {
         }
       }
 
-      await fetch(`${API_URL}/api/pedidos/${pedidoCreado.id}/imprimir/`, {
-        method: "POST",
-      });
-
-      setPedidoConfirmado(true);
+     setPedidoConfirmado(true);
+        window.print();
     } catch (error) {
       console.error(error);
       alert("Hubo un error al registrar o imprimir el pedido.");
