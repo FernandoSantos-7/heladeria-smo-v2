@@ -4,7 +4,6 @@ import { GUSTOS_POR_POTE } from "../../constants/config";
 
 const AVISO_POR_POTE = {
   "pote-1-4-kilo": "Se necesitan al menos 2 en el pedido",
-  "pote-1-2-kilo": "4 gustos"
 };
 
 export default function SeccionPotes({ poteElegido, onElegirPote }) {
@@ -15,6 +14,8 @@ export default function SeccionPotes({ poteElegido, onElegirPote }) {
         {productos.potes.map((p) => {
           const activo = poteElegido?.id === p.id;
           const aviso = AVISO_POR_POTE[p.id];
+          const limiteGustos = GUSTOS_POR_POTE[p.id] ?? 1;
+
           return (
             <button
               key={p.id}
@@ -28,7 +29,7 @@ export default function SeccionPotes({ poteElegido, onElegirPote }) {
               <p className="font-bold text-sm text-gray-800">{p.nombre}</p>
               <p className="text-xs text-gray-500">${p.precio.toLocaleString("es-AR")}</p>
               <p className="text-[11px] text-gray-400 mt-1">
-                {GUSTOS_POR_POTE[p.id] ?? 1} gusto{(GUSTOS_POR_POTE[p.id] ?? 1) > 1 ? "s" : ""}
+                {limiteGustos} gusto{limiteGustos > 1 ? "s" : ""}
               </p>
               {aviso && (
                 <p className="text-[11px] text-[#a9762f] font-medium mt-0.5">{aviso}</p>
