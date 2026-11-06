@@ -34,6 +34,9 @@ function App() {
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
   const [metodoPago, setMetodoPago] = useState("Efectivo");
 
+  // Estado temporal para guardar los datos del último pedido impreso
+  const [ultimoPedido, setUltimoPedido] = useState(null);
+
   // Estado local para la animación de éxito del botón en potes
   const [agregadoPote, setAgregadoPote] = useState(false);
 
@@ -84,7 +87,7 @@ function App() {
     // Activamos la animación verde de éxito
     setAgregadoPote(true);
 
-    // Limpiamos los gustos elegidos después de un breve delay para que se alcance a ver el verde
+    // Limpiamos los gustos elegidos después de un breve delay
     setTimeout(() => {
       setGustosElegidos([]);
       setAgregadoPote(false);
@@ -98,6 +101,16 @@ function App() {
     if (Object.keys(nuevosErrores).length > 0) return;
     if (!cumpleMinimo) return;
     if (faltanCuartos) return;
+
+    // Guardamos copia de los datos actuales para el ticket antes de procesar
+    const datosPedidoActual = {
+      cliente: { ...datosCliente },
+      items: [...items],
+      total: total,
+      metodoPago: metodoPago,
+      fecha: new Date().toLocaleString(),
+    };
+    setUltimoPedido(datosPedidoActual);
 
     try {
       const pedidoData = {
@@ -147,8 +160,12 @@ function App() {
         }
       }
 
-     setPedidoConfirmado(true);
+      setPedidoConfirmado(true);
+      // Disparamos la impresión limpia en la 3nStar
+      setTimeout(() => {
         window.print();
+      }, 300);
+
     } catch (error) {
       console.error(error);
       alert("Hubo un error al registrar o imprimir el pedido.");
@@ -157,6 +174,73 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative overflow-hidden">
+      
+      {/* ESTILOS CSS EXCLUSIVOS PARA IMPRESIÓN TÉRMICA (3nStar) */}
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden !important;
+          }
+          #ticket-impresion-termica, #ticket-impresion-termica * {
+            visibility: visible !important;
+          }
+          #ticket-impresion-termica {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 80mm !important;
+            margin: 0 !important;
+            padding: 5px !important;
+            font-family: 'Courier New', Courier, monospace !important;
+            font-size: 12px !important;
+            color: black !important;
+            background: white !important;
+          }
+        }
+      `}</style>
+
+      {/* TICKET OCULTO EXCLUSIVO PARA LA IMPRESORA TÉRMICA */}
+      <div id="ticket-impresion-termica" className="hidden">
+        {ultimoPedido && (
+          <div style={{ width: "100%", textAlign: "left", lineHeight: "1.2" }}>
+            <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", marginBottom: "6px" }}>
+              HELADERÍA S'MO
+            </div>
+            <div style={{ textAlign: "center", fontSize: "10px", marginBottom: "8px" }}>
+              Av. Boulogne Sur Mer 1099<br/>
+              Tapiales, Buenos Aires
+            </div>
+            <div>------------------------------------</div>
+            <div style={{ fontSize: "11px", margin: "4px 0" }}>
+              <strong>Fecha:</strong> {ultimoPedido.fecha}<br/>
+              <strong>Cliente:</strong> {ultimoPedido.cliente.nombre}<br/>
+              <strong>Tel:</strong> {ultimoPedido.cliente.telefono}<br/>
+              <strong>Dirección:</strong> {ultimoPedido.cliente.direccion}
+            </div>
+            <div>------------------------------------</div>
+            <div style={{ fontWeight: "bold", fontSize: "11px", margin: "4px 0" }}>DETALLE DEL PEDIDO:</div>
+            {ultimoPedido.items.map((it, idx) => (
+              <div key={idx} style={{ fontSize: "11px", marginBottom: "4px" }}>
+                - {it.cantidad}x {it.nombre} (${it.precio * it.cantidad})
+              </div>
+            ))}
+            <div>------------------------------------</div>
+            <div style={{ fontSize: "11px", margin: "4px 0" }}>
+              <strong>Método de pago:</strong> {ultimoPedido.metodoPago}
+            </div>
+            <div style={{ fontSize: "13px", fontWeight: "bold", marginTop: "6px" }}>
+              TOTAL: ${ultimoPedido.total.toLocaleString()}
+            </div>
+            <div>------------------------------------</div>
+            <div style={{ textAlign: "center", fontSize: "10px", marginTop: "8px" }}>
+              ¡Gracias por tu compra!<br/>
+              S'MO - La dulce tentación
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* FONDO Y DISEÑO DE LA APLICACIÓN WEB */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -295,7 +379,7 @@ function App() {
 
               {pedidoConfirmado && (
                 <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mt-3">
-                  ¡Pedido confirmado! (Acá en el próximo paso lo mandamos por WhatsApp)
+                  ¡Pedido confirmado e impreso correctamente en el mostrador!
                 </p>
               )}
             </>
