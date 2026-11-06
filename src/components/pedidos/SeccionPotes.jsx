@@ -4,6 +4,7 @@ import { GUSTOS_POR_POTE } from "../../constants/config";
 
 const AVISO_POR_POTE = {
   "pote-1-4-kilo": "Se necesitan al menos 2 en el pedido",
+  "pote-1-2-kilo": "4 gustos"
 };
 
 export default function SeccionPotes({ poteElegido, onElegirPote }) {
