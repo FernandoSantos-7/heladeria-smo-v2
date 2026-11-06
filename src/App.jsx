@@ -89,6 +89,83 @@ function App() {
     }, 800);
   }
 
+  // FUNCIÓN PROFESIONAL DE IMPRESIÓN DIRECTA POR VENTANA EMERGENTE (Cero errores de CSS)
+  function imprimirComandaTermica(pedidoInfo) {
+    const ventanaImpresion = window.open('', '_blank', 'width=400,height=600');
+    
+    let htmlContenido = `
+      <html>
+        <head>
+          <title>Comanda - Heladería S'MO</title>
+          <style>
+            body {
+              font-family: 'Courier New', Courier, monospace;
+              font-size: 12px;
+              line-height: 1.3;
+              color: black;
+              width: 78mm;
+              margin: 0;
+              padding: 5px;
+            }
+            .text-center { text-align: center; }
+            .bold { font-weight: bold; }
+            .line { border-bottom: 1px dashed black; margin: 6px 0; }
+            .right { text-align: right; }
+          </style>
+        </head>
+        <body>
+          <div class="text-center bold" style="font-size: 14px;">*** HELADERÍA S'MO ***</div>
+          <div class="text-center" style="font-size: 10px; margin-bottom: 4px;">${new Date().toLocaleString()}</div>
+          <div class="line"></div>
+          <div>
+            <strong>Cliente:</strong> ${pedidoInfo.cliente.nombre || "Mostrador"}<br/>
+            <strong>Tel:</strong> ${pedidoInfo.cliente.telefono || "-"}<br/>
+            <strong>Dirección:</strong> ${pedidoInfo.cliente.direccion || "Retira en local"}
+          </div>
+          <div class="line"></div>
+          <div class="bold">DETALLE DE PEDIDO:</div>
+    `;
+
+    pedidoInfo.items.forEach(it => {
+      htmlContenido += `
+        <div style="margin-bottom: 6px;">
+          <div class="bold">${it.cantidad}x ${it.nombre}</div>
+          ${it.gustos ? `<div style="padding-left: 10px; font-size: 11px;">Gustos: ${it.gustos}</div>` : ''}
+          <div class="right" style="font-size: 11px;">Subtotal: $${it.precio * it.cantidad}</div>
+        </div>
+      `;
+    });
+
+    if (pedidoInfo.notas && pedidoInfo.notas.trim() !== "") {
+      htmlContenido += `
+        <div class="line"></div>
+        <div>
+          <strong>OBSERVACIONES (Lucas):</strong><br/>
+          ${pedidoInfo.notas}
+        </div>
+      `;
+    }
+
+    htmlContenido += `
+          <div class="line"></div>
+          <div><strong>Método de pago:</strong> ${pedidoInfo.metodoPago}</div>
+          <div class="bold" style="font-size: 13px; margin-top: 4px;">TOTAL A PAGAR: $${pedidoInfo.total.toLocaleString()}</div>
+          <div class="line"></div>
+          <div class="text-center" style="font-size: 10px; margin-top: 6px;">¡Gracias por tu compra! 🍦</div>
+        </body>
+      </html>
+    `;
+
+    ventanaImpresion.document.write(htmlContenido);
+    ventanaImpresion.document.close();
+    ventanaImpresion.focus();
+    
+    setTimeout(() => {
+      ventanaImpresion.print();
+      ventanaImpresion.close();
+    }, 300);
+  }
+
   async function confirmarPedido() {
     const nuevosErrores = validarDatosCliente(datosCliente);
     setErrores(nuevosErrores);
@@ -146,7 +223,15 @@ function App() {
       }
 
       setPedidoConfirmado(true);
-      window.print();
+
+      // Disparamos la comanda térmica limpia en la impresora
+      imprimirComandaTermica({
+        cliente: datosCliente,
+        items: items,
+        total: total,
+        metodoPago: metodoPago,
+        notas: notasCliente
+      });
 
     } catch (error) {
       console.error(error);
@@ -156,41 +241,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative">
-      
-      {/* ESTILOS CSS DEFINITIVOS PARA LA COMANDA TÉRMICA */}
-      <style>{`
-        /* Ocultamos la comanda en la pantalla normal para que el cliente no la vea */
-        .comanda-impresion {
-          display: none;
-        }
-
-        @media print {
-          /* Ocultamos todo el cuerpo de la página */
-          body * {
-            display: none !important;
-          }
-          /* Forzamos que únicamente se muestre la comanda térmica */
-          .comanda-impresion, .comanda-impresion * {
-            display: block !important;
-            visibility: visible !important;
-          }
-          .comanda-impresion {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 78mm !important;
-            margin: 0 !important;
-            padding: 2mm !important;
-            font-family: 'Courier New', Courier, monospace !important;
-            font-size: 12px !important;
-            line-height: 1.2 !important;
-            color: black !important;
-            background: white !important;
-          }
-        }
-      `}</style>
-
-      {/* DISEÑO VISUAL DE LA TIENDA */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -350,60 +400,6 @@ function App() {
           )}
         </main>
       </div>
-
-      {/* TICKET / COMANDA TÉRMICA FUERA DE LOS CONTENEDORES CON OVERFLOW */}
-      <div className="comanda-impresion">
-        <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", marginBottom: "4px" }}>
-          *** HELADERÍA S'MO ***
-        </div>
-        <div style={{ textAlign: "center", fontSize: "10px", marginBottom: "6px" }}>
-          {new Date().toLocaleString()}
-        </div>
-        <div>----------------------------------------</div>
-        <div style={{ fontSize: "11px", margin: "4px 0" }}>
-          <strong>Cliente:</strong> {datosCliente.nombre || "Mostrador"}<br/>
-          <strong>Tel:</strong> {datosCliente.telefono || "-"}<br/>
-          <strong>Dirección:</strong> {datosCliente.direccion || "Retira en local"}
-        </div>
-        <div>----------------------------------------</div>
-        <div style={{ fontWeight: "bold", fontSize: "12px", margin: "4px 0" }}>DETALLE DE PEDIDO:</div>
-        {items.map((it, idx) => (
-          <div key={idx} style={{ fontSize: "12px", marginBottom: "6px", borderBottom: "1px dashed #666", paddingBottom: "4px" }}>
-            <div><strong>{it.cantidad}x {it.nombre}</strong></div>
-            {it.gustos && (
-              <div style={{ fontSize: "11px", marginTop: "2px", paddingLeft: "6px" }}>
-                <strong>Gustos:</strong> {it.gustos}
-              </div>
-            )}
-            <div style={{ fontSize: "11px", marginTop: "2px", textAlign: "right" }}>
-              Subtotal: ${it.precio * it.cantidad}
-            </div>
-          </div>
-        ))}
-
-        {notasCliente.trim() !== "" && (
-          <>
-            <div>----------------------------------------</div>
-            <div style={{ fontSize: "11px", margin: "4px 0" }}>
-              <strong>OBSERVACIONES:</strong><br/>
-              {notasCliente}
-            </div>
-          </>
-        )}
-
-        <div>----------------------------------------</div>
-        <div style={{ fontSize: "11px", margin: "4px 0" }}>
-          <strong>Método de pago:</strong> {metodoPago}
-        </div>
-        <div style={{ fontSize: "13px", fontWeight: "bold", marginTop: "4px" }}>
-          TOTAL A PAGAR: ${total.toLocaleString()}
-        </div>
-        <div>----------------------------------------</div>
-        <div style={{ textAlign: "center", fontSize: "10px", marginTop: "6px" }}>
-          ¡Gracias por tu compra! 🍦
-        </div>
-      </div>
-
     </div>
   );
 }
