@@ -22,7 +22,6 @@ const ID_POTE_CUARTO = "pote-1-4-kilo";
 const MINIMO_POTE_CUARTO = 2;
 const WHATSAPP_NUMERO = "5491154229565";
 
-// URL dinámica que lee la variable de Vercel o usa Render por defecto
 const API_URL = import.meta.env.VITE_BACKEND_URL || "https://heladeria-smo-v2.onrender.com";
 
 function App() {
@@ -30,11 +29,11 @@ function App() {
   const [poteElegido, setPoteElegido] = useState(null);
   const [gustosElegidos, setGustosElegidos] = useState([]);
   const [datosCliente, setDatosCliente] = useState({ nombre: "", telefono: "", direccion: "" });
+  const [notasCliente, setNotasCliente] = useState(""); // <--- Estado para las notas de Lucas
   const [errores, setErrores] = useState({});
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
   const [metodoPago, setMetodoPago] = useState("Efectivo");
 
-  // Estado local para la animación de éxito del botón en potes
   const [agregadoPote, setAgregadoPote] = useState(false);
 
   const {
@@ -82,10 +81,8 @@ function App() {
       });
     }
 
-    // Activamos la animación verde de éxito
     setAgregadoPote(true);
 
-    // Limpiamos los gustos elegidos después de un breve delay
     setTimeout(() => {
       setGustosElegidos([]);
       setAgregadoPote(false);
@@ -149,8 +146,6 @@ function App() {
       }
 
       setPedidoConfirmado(true);
-      
-      // Disparamos la impresión directa de la comanda
       window.print();
 
     } catch (error) {
@@ -162,7 +157,7 @@ function App() {
   return (
     <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative overflow-hidden">
       
-      {/* ESTILOS CSS EXCLUSIVOS PARA LA COMANDA TÉRMICA (3nStar) */}
+      {/* ESTILOS CSS PARA LA COMANDA TÉRMICA */}
       <style>{`
         @media print {
           body * {
@@ -186,7 +181,7 @@ function App() {
         }
       `}</style>
 
-      {/* COMANDA / TICKET PARA EL MOSTRADOR (Siempre en el DOM, oculto en pantalla) */}
+      {/* COMANDA / TICKET PARA EL MOSTRADOR */}
       <div id="comanda-termica" className="hidden">
         <div style={{ width: "100%", textAlign: "left", lineHeight: "1.2" }}>
           <div style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", marginBottom: "4px" }}>
@@ -213,6 +208,18 @@ function App() {
               )}
             </div>
           ))}
+
+          {/* SECCIÓN DE NOTAS SI EL CLIENTE ESCRIBIÓ ALGO */}
+          {notasCliente.trim() !== "" && (
+            <>
+              <div>------------------------------------</div>
+              <div style={{ fontSize: "11px", margin: "4px 0" }}>
+                <strong>OBSERVACIONES:</strong><br/>
+                {notasCliente}
+              </div>
+            </>
+          )}
+
           <div>------------------------------------</div>
           <div style={{ fontSize: "11px", margin: "4px 0" }}>
             <strong>Método de pago:</strong> {metodoPago}
@@ -227,7 +234,6 @@ function App() {
         </div>
       </div>
 
-      {/* FONDO Y DISEÑO DE LA APLICACIÓN WEB */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -325,6 +331,21 @@ function App() {
                 onCambiarDatos={setDatosCliente}
                 errores={errores}
               />
+
+              {/* CAMPO DE NOTAS / OBSERVACIONES PARA LUCAS */}
+              <div className="mb-6">
+                <label className="block text-gray-800 font-bold mb-2 text-sm">
+                  Notas o aclaraciones para el pedido (Opcional):
+                </label>
+                <textarea
+                  value={notasCliente}
+                  onChange={(e) => setNotasCliente(e.target.value)}
+                  placeholder="Ej: Poneme más cantidad del gusto Dubai, por favor..."
+                  className="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#4a5d4a] text-sm bg-white"
+                  rows="2"
+                />
+              </div>
+
               <div className="mb-6">
                 <label className="block text-gray-800 font-bold mb-3 text-lg">Método de pago:</label>
                 <div className="grid grid-cols-2 gap-4">
