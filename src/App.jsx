@@ -47,10 +47,12 @@ function App() {
   } = useCarrito();
 
   const cantidadPoteCuarto = items
-    .filter((it) => it.id === ID_POTE_CUARTO)
+    .filter((it) => it.productoId === ID_POTE_CUARTO || it.id === ID_POTE_CUARTO)
     .reduce((acc, it) => acc + it.cantidad, 0);
 
-  const hayOtrosProductos = items.some((it) => it.id !== ID_POTE_CUARTO);
+  const hayOtrosProductos = items.some(
+    (it) => it.productoId !== ID_POTE_CUARTO && it.id !== ID_POTE_CUARTO
+  );
 
   const faltanCuartos =
     cantidadPoteCuarto > 0 &&
@@ -91,8 +93,8 @@ function App() {
 
   // FUNCIÓN DE IMPRESIÓN CON @page PARA ROLLO TÉRMICO DE 80MM
   function imprimirComandaTermica(pedidoInfo) {
-    const ventanaImpresion = window.open('', '_blank', 'width=400,height=600');
-    
+    const ventanaImpresion = window.open("", "_blank", "width=400,height=600");
+
     let htmlContenido = `
       <html>
         <head>
@@ -119,7 +121,7 @@ function App() {
         </head>
         <body>
           <div class="text-center bold" style="font-size: 14px;">*** HELADERÍA S'MO ***</div>
-          <div class="text-center" style="font-size: 10px; margin-bottom: 4px;">${new Date().toLocaleString()}</div>
+          <div class="text-center" style="font-size: 10px; margin-bottom: 4px;">${new Date().toLocaleString("es-AR")}</div>
           <div class="line"></div>
           <div>
             <strong>Cliente:</strong> ${pedidoInfo.cliente.nombre || "Mostrador"}<br/>
@@ -130,12 +132,13 @@ function App() {
           <div class="bold">DETALLE DE PEDIDO:</div>
     `;
 
-    pedidoInfo.items.forEach(it => {
+    pedidoInfo.items.forEach((it) => {
+      const subtotalItem = (it.precio * it.cantidad).toLocaleString("es-AR");
       htmlContenido += `
         <div style="margin-bottom: 6px;">
           <div class="bold">${it.cantidad}x ${it.nombre}</div>
-          ${it.gustos ? `<div style="padding-left: 10px; font-size: 11px;">Gustos: ${it.gustos}</div>` : ''}
-          <div class="right" style="font-size: 11px;">Subtotal: $${it.precio * it.cantidad}</div>
+          ${it.gustos ? `<div style="padding-left: 10px; font-size: 11px;">Gustos: ${it.gustos}</div>` : ""}
+          <div class="right" style="font-size: 11px;">Subtotal: $${subtotalItem}</div>
         </div>
       `;
     });
@@ -153,7 +156,7 @@ function App() {
     htmlContenido += `
           <div class="line"></div>
           <div><strong>Método de pago:</strong> ${pedidoInfo.metodoPago}</div>
-          <div class="bold" style="font-size: 13px; margin-top: 4px;">TOTAL A PAGAR: $${pedidoInfo.total.toLocaleString()}</div>
+          <div class="bold" style="font-size: 13px; margin-top: 4px;">TOTAL A PAGAR: $${pedidoInfo.total.toLocaleString("es-AR")}</div>
           <div class="line"></div>
           <div class="text-center" style="font-size: 10px; margin-top: 6px;">¡Gracias por tu compra! 🍦</div>
         </body>
@@ -163,7 +166,7 @@ function App() {
     ventanaImpresion.document.write(htmlContenido);
     ventanaImpresion.document.close();
     ventanaImpresion.focus();
-    
+
     setTimeout(() => {
       ventanaImpresion.print();
       ventanaImpresion.close();
@@ -205,7 +208,7 @@ function App() {
 
       if (!respuesta.ok) throw new Error("Error al guardar el pedido en el servidor");
 
-      const pedidoCreado = await respuesta.json();
+      await respuesta.json();
 
       if (metodoPago === "Mercado Pago") {
         const respMp = await fetch(`${API_URL}/api/crear-preferencia/`, {
@@ -233,9 +236,8 @@ function App() {
         items: items,
         total: total,
         metodoPago: metodoPago,
-        notas: notasCliente
+        notas: notasCliente,
       });
-
     } catch (error) {
       console.error(error);
       alert("Hubo un error al registrar o imprimir el pedido.");
@@ -243,7 +245,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative">
+    <div className="min-h-screen bg-[#e8ede8] font-sans p-4 relative" translate="no">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -279,8 +281,8 @@ function App() {
                 <button
                   onClick={agregarAlCarrito}
                   className={`w-full rounded-xl py-3 font-bold text-white transition-all duration-200 active:scale-95 shadow-md mb-6 flex items-center justify-center gap-2 ${
-                    agregadoPote 
-                      ? "bg-green-500 scale-95" 
+                    agregadoPote
+                      ? "bg-green-500 scale-95"
                       : "bg-[#4a5d4a] hover:bg-[#3d4d3d]"
                   }`}
                 >
@@ -312,10 +314,9 @@ function App() {
             <SeccionBlister onAgregarAlCarrito={agregarItem} />
           )}
           {seccionActiva === "vasitos" && (
-           <SeccionVasitos onAgregarAlCarrito={agregarItem} />
+            <SeccionVasitos onAgregarAlCarrito={agregarItem} />
           )}
-          {seccionActiva === "cafeteria" && 
-          ( <SeccionCafeteria />)}
+          {seccionActiva === "cafeteria" && <SeccionCafeteria />}
 
           <ResumenPedido
             items={items}
@@ -328,9 +329,7 @@ function App() {
 
           {faltanCuartos && (
             <p className="text-xs text-[#a9762f] bg-[#f7ecd9] border border-[#e8d3a5] rounded-lg p-3 mb-4">
-              Tenés {cantidadPoteCuarto} Un pote de 1/4 kg en el pedido.
-              Si el pedido contiene únicamente un potes de 1/4 kg, el mínimo es de {MINIMO_POTE_CUARTO} unidades.
-              También podés agregar cualquier otro producto y continuar con tu compra.
+              {`Tenés ${cantidadPoteCuarto} pote de 1/4 kg en el pedido. Si el pedido contiene únicamente potes de 1/4 kg, el mínimo es de ${MINIMO_POTE_CUARTO} unidades. También podés agregar cualquier otro producto y continuar con tu compra.`}
             </p>
           )}
 
@@ -356,7 +355,9 @@ function App() {
               </div>
 
               <div className="mb-6">
-                <label className="block text-gray-800 font-bold mb-3 text-lg">Método de pago:</label>
+                <label className="block text-gray-800 font-bold mb-3 text-lg">
+                  Método de pago:
+                </label>
                 <div className="grid grid-cols-2 gap-4">
                   <button
                     type="button"
@@ -380,7 +381,11 @@ function App() {
                         : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
                     }`}
                   >
-                    <img src={logoMercadoPago} alt="Mercado Pago" className="w-48 h-22 object-contain" />
+                    <img
+                      src={logoMercadoPago}
+                      alt="Mercado Pago"
+                      className="w-48 h-22 object-contain"
+                    />
                     <span className="text-base">Mercado Pago</span>
                   </button>
                 </div>

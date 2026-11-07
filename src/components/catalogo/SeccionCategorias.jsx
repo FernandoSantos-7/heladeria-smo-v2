@@ -24,21 +24,21 @@ const CATEGORIA_COLOR = {
     textoSeleccionado: "text-[#D2691E]"
   },
   Crema: {
-    borde: "border-l-[#8A2BE2]", // Un violeta eléctrico/fluo divino
+    borde: "border-l-[#8A2BE2]",
     hover: "hover:border-[#8A2BE2] hover:bg-[#8A2BE2]/10 hover:shadow-[0_0_20px_rgba(138,43,226,0.4)]",
     activoBg: "bg-[#8A2BE2]/15",
     activoBorder: "border-[#8A2BE2]",
     textoSeleccionado: "text-[#8A2BE2]"
   },
   Agua: {
-    borde: "border-l-[#00CED1]", // Turquesa/celeste fluo fresco
+    borde: "border-l-[#00CED1]",
     hover: "hover:border-[#00CED1] hover:bg-[#00CED1]/10 hover:shadow-[0_0_20px_rgba(0,206,209,0.4)]",
     activoBg: "bg-[#00CED1]/15",
     activoBorder: "border-[#00CED1]",
     textoSeleccionado: "text-[#00CED1]"
   },
   "Nuevos Sabores": {
-    borde: "border-l-[#FFD700]", // Dorado solar brillante
+    borde: "border-l-[#FFD700]",
     hover: "hover:border-[#FFD700] hover:bg-[#FFD700]/15 hover:shadow-[0_0_25px_rgba(255,215,0,0.5)]",
     activoBg: "bg-[#FFD700]/20",
     activoBorder: "border-[#FFD700]",
@@ -46,9 +46,10 @@ const CATEGORIA_COLOR = {
   }
 };
 
-export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambiarGustos }) {
+export default function SeccionCategorias({ poteElegido, gustosElegidos = [], onCambiarGustos }) {
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
   const limite = poteElegido ? GUSTOS_POR_POTE[poteElegido.id] ?? 1 : 0;
+  const cantidadElegidos = Array.isArray(gustosElegidos) ? gustosElegidos.length : 0;
 
   function toggleGusto(nombre) {
     if (gustosElegidos.includes(nombre)) {
@@ -56,7 +57,7 @@ export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambi
       return;
     }
 
-    if (gustosElegidos.length >= limite) return;
+    if (cantidadElegidos >= limite) return;
 
     const nuevosGustos = [...gustosElegidos, nombre];
     onCambiarGustos(nuevosGustos);
@@ -73,14 +74,34 @@ export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambi
     textoSeleccionado: "text-[#4a5d4a]"
   };
 
+  const textoContador = `Podés elegir ${limite} ${limite > 1 ? "gustos" : "gusto"} (llevás ${cantidadElegidos})`;
+
   return (
-    <section className="mb-6">
+    <section className="mb-6" translate="no">
       <p className="text-sm text-gray-500 mb-2">2. Elegí tus gustos por categoría</p>
 
       {poteElegido && (
-        <p className="text-xs text-[#4a5d4a] mb-2 font-medium">
-          Podés elegir {limite} gusto{limite > 1 ? "s" : ""} (llevás {gustosElegidos.length})
-        </p>
+        <div className="mb-3">
+          <p className="text-xs text-[#4a5d4a] font-semibold">
+            {textoContador}
+          </p>
+
+          {cantidadElegidos > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {gustosElegidos.map((gusto) => (
+                <span
+                  key={gusto}
+                  onClick={() => toggleGusto(gusto)}
+                  className="inline-flex items-center gap-1 text-xs bg-[#4a5d4a]/10 text-[#4a5d4a] border border-[#4a5d4a]/30 px-2.5 py-1 rounded-full cursor-pointer hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition"
+                  title="Tocar para quitar"
+                >
+                  {gusto}
+                  <X size={12} />
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       <div className="grid grid-cols-2 gap-3">
@@ -89,7 +110,7 @@ export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambi
           const colorBorde = configCat.borde || "border-l-gray-300";
           const hoverEfecto = configCat.hover || "hover:border-gray-400";
           const cantidad = catalogo.helados.filter((h) => h.categoria === cat).length;
-          
+
           return (
             <button
               key={cat}
@@ -98,7 +119,7 @@ export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambi
               className={`bg-white border border-gray-200 border-l-4 ${colorBorde} text-left p-4 rounded-xl disabled:opacity-40 transition ${hoverEfecto} hover:shadow-md`}
             >
               <p className="font-bold text-sm text-gray-800">{cat}</p>
-              <p className="text-[11px] text-gray-400">{cantidad} sabores</p>
+              <p className="text-[11px] text-gray-400">{`${cantidad} sabores`}</p>
             </button>
           );
         })}
@@ -128,8 +149,11 @@ export default function SeccionCategorias({ poteElegido, gustosElegidos, onCambi
                 <X size={18} />
               </button>
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-between p-3">
                 <h2 className="text-white font-bold">{categoriaAbierta}</h2>
+                <span className="text-xs bg-black/60 text-white px-2.5 py-1 rounded-full font-medium">
+                  {`Llevás ${cantidadElegidos} de ${limite}`}
+                </span>
               </div>
             </div>
 
