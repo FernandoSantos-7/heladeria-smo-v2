@@ -8,15 +8,14 @@ const AVISO_POR_POTE = {
 
 export default function SeccionPotes({ poteElegido, onElegirPote }) {
   return (
-    <section className="mb-6">
+    <section className="mb-6" translate="no">
       <p className="text-sm text-gray-500 mb-2">Elegí tu presentación</p>
       <div className="grid grid-cols-3 gap-3">
         {productos.potes.map((p) => {
           const activo = poteElegido?.id === p.id;
           const aviso = AVISO_POR_POTE[p.id];
-
-          // Un solo origen de verdad: el límite sale de config.js
           const limiteGustos = GUSTOS_POR_POTE[p.id] ?? 3;
+          const textoGustos = `Hasta ${limiteGustos} ${limiteGustos > 1 ? "gustos" : "gusto"}`;
 
           return (
             <button
@@ -29,9 +28,11 @@ export default function SeccionPotes({ poteElegido, onElegirPote }) {
               }`}
             >
               <p className="font-bold text-sm text-gray-800">{p.nombre}</p>
-              <p className="text-xs text-gray-500">${p.precio.toLocaleString("es-AR")}</p>
+              <p className="text-xs text-gray-500">
+                {`$${p.precio.toLocaleString("es-AR")}`}
+              </p>
               <p className="text-[11px] text-gray-400 mt-1">
-                Hasta {limiteGustos} gusto{limiteGustos > 1 ? "s" : ""}
+                {textoGustos}
               </p>
               {aviso && (
                 <p className="text-[11px] text-[#a9762f] font-medium mt-0.5">{aviso}</p>
